@@ -1,0 +1,5 @@
+color: '#7b1fa2'
+description: LLM、Transformer、RLHF等知识点
+icon: bi-robot
+name: 大模型知识点
+order: 2

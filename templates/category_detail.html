@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - StudyNotes{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+    <!-- Breadcrumb -->
+    <nav class="crumb">
+        <a href="{{ root }}"><i class="bi bi-house-heart"></i> 首页</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ category.name }}</span>
+    </nav>
+
+    <div class="page-body">
+        <!-- Sidebar TOC -->
+        <div class="page-side-left">
+            <div class="glass-card toc-sidebar">
+                <div class="glass-card-head">
+                    <i class="bi bi-list-nested"></i>
+                    <span>目录导航</span>
+                </div>
+                <nav class="cat-toc">
+                    {% for sub in category.subcategories %}
+                    <div class="toc-group">
+                        <a href="#sub-{{ sub.slug }}" class="toc-group-title">
+                            <i class="bi bi-folder2"></i>
+                            <span>{{ sub.name }}</span>
+                            <span class="toc-count">{{ sub.articles|length }}</span>
+                        </a>
+                        {% for article in sub.articles %}
+                        <a href="{{ sub.slug }}/{{ article.slug }}/" class="toc-leaf">
+                            {% if article.pinned %}<i class="bi bi-pin-angle-fill pin-icon"></i>{% endif %}
+                            {{ article.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color: var(--text-3); font-size: 0.82rem; padding: 0.5rem 0.8rem;">暂无内容</p>
+                    {% endfor %}
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <div class="page-main">
+            <!-- Category Header -->
+            <div class="cat-hero" style="--accent: {{ category.color }}">
+                <div class="cat-hero-icon" style="background: {{ category.color }}; color: #fff;">
+                    <i class="bi {{ category.icon }}"></i>
+                </div>
+                <div class="cat-hero-info">
+                    <h1>{{ category.name }}</h1>
+                    {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+                    <div class="cat-hero-meta">
+                        <span><i class="bi bi-folder2-open"></i> {{ category.subcategories|length }} 个小分区</span>
+                        <span><i class="bi bi-file-earmark-text"></i> {{ category.article_count }} 篇笔记</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SubCategories -->
+            {% for sub in category.subcategories %}
+            <section class="sub-section" id="sub-{{ sub.slug }}">
+                <div class="sub-head">
+                    <div class="sub-title">
+                        <div class="sub-marker" style="background: {{ category.color }}"></div>
+                        <h2>{{ sub.name }}</h2>
+                        <span class="sub-count">{{ sub.articles|length }} 篇</span>
+                    </div>
+                </div>
+
+                {% if sub.articles %}
+                <div class="article-list">
+                    {% for article in sub.articles %}
+                    <a href="{{ sub.slug }}/{{ article.slug }}/" class="art-row">
+                        {% if article.pinned %}<span class="art-pin"><i class="bi bi-pin-angle-fill"></i></span>{% endif %}
+                        <div class="art-row-main">
+                            <h4>{{ article.title }}</h4>
+                            <p>{{ article.summary }}</p>
+                        </div>
+                        <div class="art-row-meta">
+                            <time><i class="bi bi-clock"></i> {{ article.updated[:10] }}</time>
+                            <span class="art-arrow"><i class="bi bi-arrow-right-short"></i></span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-inline">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    暂无文章
+                </div>
+                {% endif %}
+            </section>
+            {% else %}
+            <div class="empty-hero" style="margin-top: 1.5rem;">
+                <div class="empty-icon"><i class="bi bi-folder-plus"></i></div>
+                <h3>还没有小分区</h3>
+                <p>在对应分类文件夹下创建子文件夹</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

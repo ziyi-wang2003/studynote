@@ -1,0 +1,234 @@
+/* ============================================================
+   StudyNotes — Forest Design System : Tokens
+   Drop-in layer. Loaded BEFORE static/css/style.css so it
+   supplies :root vars (and keeps legacy --green-* aliases so
+   the existing stylesheet keeps rendering identically).
+   ============================================================ */
+
+/* Google Fonts already loaded in base.html — no @import needed */
+
+:root {
+  /* ── Moss (primary greens, forest canopy → deep moss) ── */
+  --moss-50:  #f1faf1;
+  --moss-100: #dcf2dc;
+  --moss-200: #b6e3b6;
+  --moss-300: #86d08b;
+  --moss-400: #4ebb65;
+  --moss-500: #2ea052;
+  --moss-600: #1f7f3f;
+  --moss-700: #186432;
+  --moss-800: #134f29;
+  --moss-900: #0e3a1e;
+
+  /* ── Fern (vibrant accent, bioluminescent highlights) ── */
+  --fern-300: #8ee87b;
+  --fern-400: #5fd762;
+  --fern-500: #2fbd58;
+  --glow-fern: 0 0 12px rgba(120, 232, 123, 0.55);
+
+  /* ── Bark (warm woody browns for mushroom caps, wood UI) ── */
+  --bark-50:  #faf5ee;
+  --bark-100: #f1e6d2;
+  --bark-200: #e3ceab;
+  --bark-300: #c8aa7b;
+  --bark-400: #a58458;
+  --bark-500: #7d6340;
+  --bark-600: #5c472d;
+  --bark-700: #443221;
+  --bark-800: #2e2217;
+  --bark-900: #1c1510;
+
+  /* ── Mist (cool atmospheric blue-green shadow) ── */
+  --mist-100: #edf4f2;
+  --mist-200: #d5e4e0;
+  --mist-300: #a9c5bf;
+  --mist-400: #7aa29c;
+  --mist-500: #547a77;
+  --mist-600: #3b5a58;
+
+  /* ── Dew (pale highlights, glints) ── */
+  --dew-100: #f5fbf7;
+  --dew-200: #e3f5ee;
+  --dew-300: #c9ebde;
+
+  /* ── Sunlight (dappled warm honey, firefly glow, pinned accent) ── */
+  --sun-200: #fde9b3;
+  --sun-300: #fcd782;
+  --sun-400: #f6b945;
+  --sun-500: #d9921e;
+  --glow-sun: 0 0 16px rgba(252, 215, 130, 0.75);
+
+  /* ── Berry (muted rose, danger, rare accent) ── */
+  --berry-300: #f9a8b4;
+  --berry-400: #ee6f84;
+  --berry-500: #d64560;
+  --berry-600: #a8304a;
+
+  /* ── Legacy aliases (keep live Django site working) ── */
+  --green-50:  var(--moss-50);
+  --green-100: var(--moss-100);
+  --green-200: var(--moss-200);
+  --green-300: var(--moss-300);
+  --green-400: var(--moss-400);
+  --green-500: var(--moss-500);
+  --green-600: var(--moss-600);
+  --green-700: var(--moss-700);
+  --green-800: var(--moss-800);
+  --green-900: var(--moss-900);
+  --emerald-400: var(--fern-400);
+  --emerald-500: var(--fern-500);
+  --lime-300: #bef264;
+  --lime-400: #a3e635;
+  --amber-300: var(--sun-300);
+  --amber-400: var(--sun-400);
+  --rose-400: var(--berry-400);
+  --sky-300: #7dd3fc;
+  --sand-50:  var(--bark-50);
+  --sand-100: #fdfaf5;
+  --sand-200: #f5f0e8;
+  --sand-300: var(--bark-200);
+  --sand-400: var(--bark-300);
+  --sand-500: var(--bark-400);
+  --sand-600: var(--bark-500);
+  --sand-700: var(--bark-600);
+  --sand-800: #2f2a23;
+  --sand-900: #1f1c18;
+
+  /* ── Semantic surface ── */
+  --bg:           #f2f8ee;
+  --bg-2:         #e7f0e0;
+  --bg-card:      rgba(255, 255, 255, 0.78);
+  --bg-card-solid:#ffffff;
+  --bg-glass:     rgba(255, 255, 255, 0.55);
+  --bg-hover:     rgba(46, 160, 82, 0.08);
+  --bg-forest:    #0e3a1e;         /* dusk/night preset */
+  --bg-wood:      #2e2217;         /* for dark panels */
+
+  --text:    #2a3729;
+  --text-2:  #536751;
+  --text-3:  #8a9b86;
+  --text-inv:#f1faf1;
+
+  --border:   rgba(30, 80, 40, 0.10);
+  --border-2: rgba(30, 80, 40, 0.05);
+  --border-hover: var(--moss-300);
+
+  --glow:         rgba(46, 160, 82, 0.10);
+  --glow-strong:  rgba(46, 160, 82, 0.20);
+
+  /* ── Shadows (all moss-tinted, not neutral grey) ── */
+  --shadow-sm: 0 1px 2px rgba(18, 75, 42, 0.04);
+  --shadow-1:  0 1px 3px rgba(18, 75, 42, 0.06), 0 1px 2px rgba(18, 75, 42, 0.04);
+  --shadow-2:  0 4px 16px rgba(18, 75, 42, 0.08), 0 1px 4px rgba(18, 75, 42, 0.04);
+  --shadow-3:  0 10px 36px rgba(18, 75, 42, 0.12), 0 2px 8px rgba(18, 75, 42, 0.05);
+  --shadow-glow: 0 4px 24px rgba(46, 160, 82, 0.18);
+  --shadow-inner-glint: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+  /* ── Radii ── */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius:    16px;
+  --radius-lg: 22px;   /* pills */
+  --radius-pill: 999px;
+
+  /* ── Spacing (8-px base) ── */
+  --s-0: 0;
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 40px;
+  --s-8: 56px;
+  --s-9: 72px;
+  --s-10: 96px;
+
+  /* ── Easing & motion ── */
+  --ease:       cubic-bezier(0.4, 0, 0.2, 1);
+  --spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-slow:  cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Typography ── */
+  --font:      'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-sc:   'Noto Sans SC', 'Inter', -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  --fs-display: 2.75rem;
+  --fs-h1:      1.75rem;
+  --fs-h2:      1.28rem;
+  --fs-h3:      1.08rem;
+  --fs-h4:      0.95rem;
+  --fs-body:    0.95rem;
+  --fs-ui:      0.87rem;
+  --fs-small:   0.78rem;
+  --fs-micro:   0.66rem;
+  --fs-mono:    0.84rem;
+
+  --lh-tight: 1.15;
+  --lh-head:  1.35;
+  --lh-body:  1.9;
+  --lh-ui:    1.5;
+
+  --fw-reg: 400;
+  --fw-med: 500;
+  --fw-semi: 600;
+  --fw-bold: 700;
+  --fw-black: 800;
+
+  /* ── Accent shortcuts used by legacy CSS ── */
+  --accent:       var(--moss-600);
+  --accent-light: var(--moss-400);
+  --accent-glow:  var(--glow);
+}
+
+/* ── Semantic type classes ─────────────────────────────── */
+.ds-display {
+  font-family: var(--font);
+  font-size: var(--fs-display);
+  font-weight: var(--fw-black);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  color: var(--moss-900);
+}
+.ds-h1 { font-size: var(--fs-h1); font-weight: var(--fw-black); line-height: var(--lh-head); letter-spacing: -0.01em; color: var(--moss-900); }
+.ds-h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); line-height: var(--lh-head); color: var(--moss-900); }
+.ds-h3 { font-size: var(--fs-h3); font-weight: 650; line-height: 1.4; color: var(--text); }
+.ds-h4 { font-size: var(--fs-h4); font-weight: var(--fw-semi); line-height: 1.45; color: var(--text); }
+.ds-body { font-size: var(--fs-body); font-weight: var(--fw-reg); line-height: var(--lh-body); color: var(--text); }
+.ds-ui { font-size: var(--fs-ui); font-weight: var(--fw-med); line-height: var(--lh-ui); color: var(--text); }
+.ds-small { font-size: var(--fs-small); line-height: var(--lh-ui); color: var(--text-2); }
+.ds-micro {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semi);
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: var(--moss-700);
+}
+.ds-mono { font-family: var(--font-mono); font-size: var(--fs-mono); line-height: var(--lh-body); }
+
+/* The brand's signature heading marker — a gradient bar to the
+   left of an h1/h2 inside prose. */
+.ds-heading-marker { position: relative; padding-left: 18px; }
+.ds-heading-marker::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.15em; bottom: 0.15em;
+  width: 3px; border-radius: 2px;
+  background: linear-gradient(to bottom, var(--moss-500), var(--fern-400));
+}
+
+/* Shimmer text (gradient title) — used sparingly on marketing heros. */
+.ds-text-gradient {
+  background: linear-gradient(135deg, var(--moss-600), var(--fern-500), var(--moss-700));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: dsShimmer 5s ease-in-out infinite;
+}
+@keyframes dsShimmer {
+  0%,100% { background-position: 0% center; }
+  50%     { background-position: 100% center; }
+}
