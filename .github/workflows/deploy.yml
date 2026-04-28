@@ -28,7 +28,7 @@ jobs:
         run: pip install jinja2 pyyaml markdown pygments
 
       - name: Build static site
-        run: python build.py
+        run: python build.py /${{ github.event.repository.name }}/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

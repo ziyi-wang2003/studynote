@@ -56,7 +56,7 @@
             {% if categories %}
             <div class="category-grid">
                 {% for cat in categories %}
-                <div class="cat-card" data-href="{{ cat.slug }}/">
+                <div class="cat-card" data-href="{{ root }}{{ cat.slug }}/">
                     <div class="cat-card-head">
                         <div class="cat-icon" style="background: {{ cat.color }}; color: #fff;">
                             <i class="bi {{ cat.icon }}"></i>
@@ -92,7 +92,7 @@
             </div>
             <div class="recent-card">
                 {% for article in recent_articles %}
-                <a href="{{ article._cat.slug }}/{{ article._sub.slug }}/{{ article.slug }}/" class="recent-row">
+                <a href="{{ root }}{{ article._cat.slug }}/{{ article._sub.slug }}/{{ article.slug }}/" class="recent-row">
                     <div class="recent-dot" style="background: {{ article._cat.color }}"></div>
                     <div class="recent-info">
                         <span class="recent-title">{{ article.title }}</span>

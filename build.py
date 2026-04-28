@@ -18,6 +18,7 @@ import os
 import re
 import shutil
 import math
+import sys
 import yaml
 import markdown as md_lib
 from pathlib import Path
@@ -28,6 +29,17 @@ from jinja2 import Environment, FileSystemLoader
 ROOT = Path(__file__).resolve().parent
 CONTENT_DIR = ROOT / 'content'
 TEMPLATE_DIR = ROOT / 'templates'
+
+# Base URL for GitHub Pages subpath deployment.
+# Set via env var or CLI arg:  python build.py /studynote/
+# For user.github.io root deployment, leave empty.
+BASE_URL = os.environ.get('BASE_URL', '').strip('/')
+if len(sys.argv) > 1:
+    BASE_URL = sys.argv[1].strip('/')
+if BASE_URL:
+    BASE_URL = '/' + BASE_URL + '/'
+else:
+    BASE_URL = '/'
 STATIC_DIR = ROOT / 'static'
 OUTPUT_DIR = ROOT / 'docs'
 
@@ -258,23 +270,25 @@ def build():
 
     recent = sorted(all_articles, key=lambda a: a.get('updated', ''), reverse=True)[:8]
 
-    # root = '' for home (top-level)
-    html = tpl.render(categories=categories, recent_articles=recent, root='')
+    # Use absolute BASE_URL for all root references
+    R = BASE_URL  # e.g. '/studynote/' or '/'
+
+    html = tpl.render(categories=categories, recent_articles=recent, root=R)
     (OUTPUT_DIR / 'index.html').write_text(html, encoding='utf-8')
 
-    # ── Category pages ──  (depth 1 → root = '../')
+    # ── Category pages ──
     cat_tpl = env.get_template('category_detail.html')
     for cat in categories:
         cat_dir = OUTPUT_DIR / cat['slug']
         cat_dir.mkdir(parents=True, exist_ok=True)
-        html = cat_tpl.render(category=cat, root='../')
+        html = cat_tpl.render(category=cat, root=R)
         (cat_dir / 'index.html').write_text(html, encoding='utf-8')
 
-        # ── Article pages ──  (depth 3 → root = '../../../')
+        # ── Article pages ──
         art_tpl = env.get_template('article_detail.html')
         for sub in cat['subcategories']:
             for art in sub['articles']:
-                rendered_content = render_markdown(art['content_raw'], root='../../../')
+                rendered_content = render_markdown(art['content_raw'], root=R)
                 toc_html = generate_toc(rendered_content)
 
                 # Siblings in same subcategory
@@ -290,7 +304,7 @@ def build():
                     category=cat,
                     subcategory=sub,
                     siblings=siblings,
-                    root='../../../',
+                    root=R,
                 )
                 (art_dir / 'index.html').write_text(html, encoding='utf-8')
 
