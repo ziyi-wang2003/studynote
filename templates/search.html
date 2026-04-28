@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}搜索{% if query %}: {{ query }}{% endif %} - StudyNotes{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+    <div class="section-head">
+        <div class="section-title">
+            <div class="section-icon"><i class="bi bi-search"></i></div>
+            <div>
+                <h2>搜索结果</h2>
+                {% if query %}<p>搜索 "{{ query }}" 找到 {{ results|length }} 条结果</p>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if query and results %}
+    <div class="recent-card">
+        {% for article in results %}
+        <a href="{% url 'notes:article_detail' article.pk %}" class="recent-row">
+            <div class="recent-dot" style="background: {{ article.category.color }}"></div>
+            <div class="recent-info">
+                <span class="recent-title">{{ article.title }}</span>
+                <span class="recent-path">{{ article.category.name }} <i class="bi bi-chevron-right"></i> {{ article.subcategory.name }}</span>
+                <p class="recent-snippet">{{ article.content|truncatechars:120 }}</p>
+            </div>
+            <time class="recent-time">{{ article.updated_at|date:"m/d" }}</time>
+        </a>
+        {% endfor %}
+    </div>
+    {% elif query %}
+    <div class="empty-hero">
+        <div class="empty-icon"><i class="bi bi-search"></i></div>
+        <h3>未找到相关内容</h3>
+        <p>换个关键词试试吧</p>
+    </div>
+    {% else %}
+    <div class="empty-hero">
+        <div class="empty-icon"><i class="bi bi-search"></i></div>
+        <h3>输入关键词搜索</h3>
+        <p>支持搜索标题和正文内容</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

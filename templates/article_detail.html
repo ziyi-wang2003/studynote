@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load markdown_extras %}
+
+{% block title %}{{ article.title }} - StudyNotes{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+    <!-- Breadcrumb -->
+    <nav class="crumb">
+        <a href="{% url 'notes:home' %}"><i class="bi bi-house-heart"></i> 首页</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'notes:category_detail' category.pk %}">{{ category.name }}</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ article.subcategory.name }}</span>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ article.title }}</span>
+    </nav>
+
+    <div class="page-body">
+        <!-- TOC Sidebar -->
+        <div class="page-side-left hide-mobile">
+            <div class="glass-card toc-sidebar">
+                <div class="glass-card-head">
+                    <i class="bi bi-list-nested"></i>
+                    <span>文章目录</span>
+                </div>
+                <div class="article-toc-wrap">
+                    {{ article.content|markdown_toc }}
+                </div>
+
+                {% if siblings %}
+                <div class="toc-divider"></div>
+                <div class="glass-card-head">
+                    <i class="bi bi-files"></i>
+                    <span>同分区文章</span>
+                </div>
+                <div class="sibling-links">
+                    {% for s in siblings %}
+                    <a href="{% url 'notes:article_detail' s.pk %}">{{ s.title }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Article -->
+        <div class="page-main">
+            <article class="article-page">
+                <!-- Header -->
+                <header class="article-head">
+                    <div class="article-head-top">
+                        <div class="article-tag" style="background: {{ category.color }}15; color: {{ category.color }}; border: 1px solid {{ category.color }}30">
+                            <i class="bi {{ category.icon }}"></i> {{ category.name }}
+                        </div>
+                        {% if user.is_authenticated %}
+                        <div class="article-head-actions">
+                            <a href="{% url 'notes:article_edit' article.pk %}" class="btn-ghost"><i class="bi bi-pencil"></i> 编辑</a>
+                            <a href="{% url 'notes:article_delete' article.pk %}" class="btn-ghost btn-ghost-danger"><i class="bi bi-trash3"></i> 删除</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h1>{{ article.title }}</h1>
+                    <div class="article-meta-bar">
+                        <span><i class="bi bi-folder2"></i> {{ article.subcategory.name }}</span>
+                        <span><i class="bi bi-calendar-plus"></i> {{ article.created_at|date:"Y年m月d日 H:i" }}</span>
+                        {% if article.updated_at != article.created_at %}
+                        <span><i class="bi bi-arrow-clockwise"></i> {{ article.updated_at|date:"Y年m月d日 H:i" }}</span>
+                        {% endif %}
+                    </div>
+                </header>
+
+                <!-- Body -->
+                <div class="article-body markdown-content">
+                    {{ article.content|markdown }}
+                </div>
+            </article>
+
+            <!-- Back -->
+            <div class="article-bottom-nav">
+                <a href="{% url 'notes:category_detail' category.pk %}" class="btn-ghost">
+                    <i class="bi bi-arrow-left"></i> 返回 {{ category.name }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // KaTeX rendering
+    var katexOpts = {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+    };
+    var body = document.querySelector('.article-body');
+    if (body) renderMathInElement(body, katexOpts);
+    var toc = document.querySelector('.article-toc-wrap');
+    if (toc) renderMathInElement(toc, katexOpts);
+
+    // TOC scroll spy
+    var headings = document.querySelectorAll('.article-body h1[id], .article-body h2[id], .article-body h3[id], .article-body h4[id]');
+    var tocLinks = document.querySelectorAll('.article-toc-wrap .toc-list a');
+    if (headings.length && tocLinks.length) {
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(function(l) { l.classList.remove('active'); });
+                    var a = document.querySelector('.article-toc-wrap a[href="#' + entry.target.id + '"]');
+                    if (a) a.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-10% 0px -75% 0px' });
+        headings.forEach(function(h) { observer.observe(h); });
+    }
+
+    // Code copy buttons
+    document.querySelectorAll('.highlight').forEach(function(block) {
+        var btn = document.createElement('button');
+        btn.className = 'code-copy-btn';
+        btn.innerHTML = '<i class="bi bi-clipboard"></i> 复制';
+        btn.addEventListener('click', function() {
+            var code = block.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                btn.innerHTML = '<i class="bi bi-check2"></i> 已复制';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.innerHTML = '<i class="bi bi-clipboard"></i> 复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+        block.style.position = 'relative';
+        block.appendChild(btn);
+    });
+
+    // Image lightbox (click to zoom)
+    document.querySelectorAll('.markdown-content img').forEach(function(img) {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', function() {
+            var overlay = document.createElement('div');
+            overlay.className = 'img-overlay';
+            overlay.innerHTML = '<img src="' + img.src + '" alt="' + (img.alt||'') + '">';
+            overlay.addEventListener('click', function() { overlay.remove(); });
+            document.body.appendChild(overlay);
+        });
+    });
+});
+</script>
+{% endblock %}

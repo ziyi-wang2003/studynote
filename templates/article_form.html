@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - StudyNotes{% endblock %}
+{% block body_class %}editor-mode{% endblock %}
+
+{% block extra_css %}
+<style>
+.editor-screen {
+    height: 100%;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .editor-screen {
+        height: auto;
+        overflow: visible;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="editor-screen">
+    <div class="container py-4" style="max-width: 960px;">
+        <nav class="crumb">
+            <a href="{% url 'notes:home' %}"><i class="bi bi-house-heart"></i> 首页</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="{% url 'notes:category_detail' category.pk %}">{{ category.name }}</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>{{ title }}</span>
+        </nav>
+
+        <div class="glass-card form-page">
+            <div class="form-page-head">
+                <i class="bi bi-pencil-square"></i>
+                <h2>{{ title }}</h2>
+            </div>
+
+            <form method="post" id="articleForm">
+                {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_title">标题</label>
+                {{ form.title }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_summary">简介 <span class="label-hint">显示在列表卡片上的一句话描述</span></label>
+                {{ form.summary }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_subcategory">所属小分区</label>
+                {{ form.subcategory }}
+            </div>
+
+            <div class="form-group">
+                <label>内容 <span class="label-hint">支持 Markdown、LaTeX 公式、代码高亮</span></label>
+                <div class="editor-wrap">
+                    <div class="editor-toolbar">
+                        <div class="toolbar-group">
+                            <button type="button" onclick="insertMd('**','**')" title="加粗 Ctrl+B"><i class="bi bi-type-bold"></i></button>
+                            <button type="button" onclick="insertMd('*','*')" title="斜体 Ctrl+I"><i class="bi bi-type-italic"></i></button>
+                            <button type="button" onclick="insertMd('~~','~~')" title="删除线"><i class="bi bi-type-strikethrough"></i></button>
+                        </div>
+                        <div class="toolbar-sep"></div>
+                        <div class="toolbar-group">
+                            <button type="button" onclick="insertMd('## ','')" title="标题"><i class="bi bi-type-h2"></i></button>
+                            <button type="button" onclick="insertMd('- ','')" title="无序列表"><i class="bi bi-list-ul"></i></button>
+                            <button type="button" onclick="insertMd('1. ','')" title="有序列表"><i class="bi bi-list-ol"></i></button>
+                            <button type="button" onclick="insertMd('> ','')" title="引用"><i class="bi bi-blockquote-left"></i></button>
+                        </div>
+                        <div class="toolbar-sep"></div>
+                        <div class="toolbar-group">
+                            <button type="button" onclick="insertMd('\`','\`')" title="行内代码"><i class="bi bi-code"></i></button>
+                            <button type="button" onclick="insertMd('\n\`\`\`python\n','\n\`\`\`\n')" title="代码块"><i class="bi bi-code-square"></i></button>
+                            <button type="button" onclick="insertMd('$','$')" title="行内公式">$</button>
+                            <button type="button" onclick="insertMd('\n$$\n','\n$$\n')" title="公式块">$$</button>
+                        </div>
+                        <div class="toolbar-sep"></div>
+                        <div class="toolbar-group">
+                            <button type="button" onclick="insertMd('[','](url)')" title="链接"><i class="bi bi-link-45deg"></i></button>
+                            <button type="button" onclick="document.getElementById('imageUpload').click()" title="上传图片"><i class="bi bi-image"></i></button>
+                            <button type="button" onclick="insertMd('\n| 列1 | 列2 |\n|------|------|\n| ','| |\n')" title="表格"><i class="bi bi-table"></i></button>
+                            <button type="button" onclick="insertMd('\n---\n','')" title="分割线"><i class="bi bi-dash-lg"></i></button>
+                        </div>
+                        <div class="toolbar-spacer"></div>
+                        <button type="button" id="togglePreview" class="toolbar-preview" title="切换预览">
+                            <i class="bi bi-eye"></i> 预览
+                        </button>
+                    </div>
+                    <input type="file" id="imageUpload" accept="image/*" style="display:none">
+                    {{ form.content }}
+                    <div id="markdownPreview" class="md-preview markdown-content" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label for="id_order">排序权重</label>
+                    {{ form.order }}
+                    <span class="form-hint">数字越小越靠前</span>
+                </div>
+                <div class="form-group">
+                    <label class="check-label">
+                        {{ form.is_pinned }}
+                        <span>置顶此文章</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-glow"><i class="bi bi-check2-circle"></i> 保存</button>
+                <a href="javascript:history.back()" class="btn-ghost">取消</a>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function insertMd(before, after) {
+    var ta = document.getElementById('id_content');
+    var start = ta.selectionStart, end = ta.selectionEnd;
+    var text = ta.value, selected = text.substring(start, end);
+    ta.value = text.substring(0, start) + before + selected + after + text.substring(end);
+    ta.focus();
+    ta.selectionStart = start + before.length;
+    ta.selectionEnd = start + before.length + selected.length;
+}
+
+// Image upload via button
+document.getElementById('imageUpload')?.addEventListener('change', function() {
+    var file = this.files[0];
+    if (!file) return;
+    uploadFile(file);
+    this.value = '';
+});
+
+// Preview toggle
+document.getElementById('togglePreview')?.addEventListener('click', function() {
+    var ta = document.getElementById('id_content');
+    var preview = document.getElementById('markdownPreview');
+    if (preview.style.display === 'none') {
+        preview.innerHTML = '<div class="preview-note">保存后可查看完整渲染效果（含代码高亮和公式）</div><div style="white-space:pre-wrap;font-family:inherit;line-height:1.8;">' +
+            ta.value.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+        preview.style.display = 'block';
+        ta.style.display = 'none';
+        this.innerHTML = '<i class="bi bi-pencil"></i> 编辑';
+    } else {
+        preview.style.display = 'none';
+        ta.style.display = 'block';
+        this.innerHTML = '<i class="bi bi-eye"></i> 预览';
+    }
+});
+
+// Paste image upload
+function uploadFile(file) {
+    var fd = new FormData();
+    fd.append('image', file);
+    fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    // Show uploading hint
+    insertMd('![上传中...]', '');
+    fetch('{% url "notes:upload_image" %}', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var ta = document.getElementById('id_content');
+            if (data.markdown) {
+                ta.value = ta.value.replace('![上传中...]', data.markdown);
+            } else {
+                ta.value = ta.value.replace('![上传中...]', '');
+                alert(data.error || '上传失败');
+            }
+        })
+        .catch(function() {
+            var ta = document.getElementById('id_content');
+            ta.value = ta.value.replace('![上传中...]', '');
+            alert('上传失败');
+        });
+}
+
+document.getElementById('id_content')?.addEventListener('paste', function(e) {
+    var items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            e.preventDefault();
+            var file = items[i].getAsFile();
+            if (file) uploadFile(file);
+            return;
+        }
+    }
+});
+
+// Drag & drop image upload
+document.getElementById('id_content')?.addEventListener('drop', function(e) {
+    var files = e.dataTransfer && e.dataTransfer.files;
+    if (!files) return;
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].type.indexOf('image') !== -1) {
+            e.preventDefault();
+            uploadFile(files[i]);
+            return;
+        }
+    }
+});
+
+document.getElementById('id_content')?.addEventListener('dragover', function(e) {
+    e.preventDefault();
+});
+
+// Keyboard shortcuts
+document.getElementById('id_content')?.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'b') { e.preventDefault(); insertMd('**','**'); }
+        if (e.key === 'i') { e.preventDefault(); insertMd('*','*'); }
+    }
+    // Tab to insert spaces
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        insertMd('    ', '');
+    }
+});
+</script>
+{% endblock %}

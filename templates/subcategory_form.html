@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - StudyNotes{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 640px;">
+    <nav class="crumb">
+        <a href="{% url 'notes:home' %}"><i class="bi bi-house-heart"></i> 首页</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{% url 'notes:category_detail' category.pk %}">{{ category.name }}</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ title }}</span>
+    </nav>
+
+    <div class="glass-card form-page">
+        <div class="form-page-head">
+            <i class="bi bi-folder-plus"></i>
+            <h2>{{ title }}</h2>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="form-error">{{ field.errors.0 }}</div>{% endif %}
+            </div>
+            {% endfor %}
+            <div class="form-actions">
+                <button type="submit" class="btn-glow"><i class="bi bi-check2-circle"></i> 保存</button>
+                <a href="{% url 'notes:category_detail' category.pk %}" class="btn-ghost">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

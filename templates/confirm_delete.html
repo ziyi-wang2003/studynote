@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}确认删除 - StudyNotes{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 480px;">
+    <div class="glass-card form-page text-center">
+        <div class="delete-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h2>确认删除</h2>
+        <p class="delete-msg">
+            确定要删除{{ type }}<strong>「{{ object }}」</strong>吗？<br>
+            <span class="text-danger">此操作不可恢复</span>
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions" style="justify-content: center;">
+                <button type="submit" class="btn-danger-solid"><i class="bi bi-trash3"></i> 确认删除</button>
+                <a href="javascript:history.back()" class="btn-ghost">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

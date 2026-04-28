@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}登录 - StudyNotes{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+    <div class="glass-card login-card">
+        <div style="text-align: center; margin-bottom: 1.5rem; padding-top: 0.8rem;">
+            <div style="width: 56px; height: 56px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--green-600), var(--emerald-500)); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.5rem; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);">
+                <i class="bi bi-flower2"></i>
+            </div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--sand-900); margin-bottom: 0.25rem;">欢迎回来</h2>
+            <p style="font-size: 0.82rem; color: var(--text-3);">登录以管理你的知识花园</p>
+        </div>
+
+        {% if form.errors %}
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-xs); padding: 0.6rem 1rem; margin-bottom: 1rem; font-size: 0.84rem; color: #ef4444; display: flex; align-items: center; gap: 6px;">
+            <i class="bi bi-exclamation-circle"></i> 用户名或密码错误
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">用户名</label>
+                <input type="text" name="username" id="id_username" class="form-control" autofocus required placeholder="输入用户名">
+            </div>
+            <div class="form-group">
+                <label for="id_password">密码</label>
+                <input type="password" name="password" id="id_password" class="form-control" required placeholder="输入密码">
+            </div>
+            <button type="submit" class="btn-glow" style="width: 100%; justify-content: center; margin-top: 0.8rem; padding: 0.6rem;">
+                <i class="bi bi-box-arrow-in-right"></i> 登录
+            </button>
+        </form>
+    </div>
+    <p style="text-align: center; font-size: 0.75rem; color: var(--text-3); margin-top: 1.5rem; font-style: italic;">Let knowledge grow naturally.</p>
+</div>
+{% endblock %}

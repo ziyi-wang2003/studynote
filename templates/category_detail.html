@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load markdown_extras %}
+
+{% block title %}{{ category.name }} - StudyNotes{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+    <!-- Breadcrumb -->
+    <nav class="crumb">
+        <a href="{% url 'notes:home' %}"><i class="bi bi-house-heart"></i> 首页</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ category.name }}</span>
+    </nav>
+
+    <div class="page-body">
+        <!-- Sidebar TOC -->
+        <div class="page-side-left">
+            <div class="glass-card toc-sidebar">
+                <div class="glass-card-head">
+                    <i class="bi bi-list-nested"></i>
+                    <span>目录导航</span>
+                </div>
+                <nav class="cat-toc">
+                    {% for sub in category.subcategories.all %}
+                    <div class="toc-group">
+                        <a href="#sub-{{ sub.pk }}" class="toc-group-title">
+                            <i class="bi bi-folder2"></i>
+                            <span>{{ sub.name }}</span>
+                            <span class="toc-count">{{ sub.articles.count }}</span>
+                        </a>
+                        {% for article in sub.articles.all %}
+                        <a href="{% url 'notes:article_detail' article.pk %}" class="toc-leaf">
+                            {% if article.is_pinned %}<i class="bi bi-pin-angle-fill pin-icon"></i>{% endif %}
+                            {{ article.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% empty %}
+                    <p style="color: var(--text-3); font-size: 0.82rem; padding: 0.5rem 0.8rem;">暂无内容</p>
+                    {% endfor %}
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <div class="page-main">
+            <!-- Category Header -->
+            <div class="cat-hero" style="--accent: {{ category.color }}">
+                <div class="cat-hero-icon" style="background: {{ category.color }}; color: #fff;">
+                    <i class="bi {{ category.icon }}"></i>
+                </div>
+                <div class="cat-hero-info">
+                    <h1>{{ category.name }}</h1>
+                    {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+                    <div class="cat-hero-meta">
+                        <span><i class="bi bi-folder2-open"></i> {{ category.subcategories.count }} 个小分区</span>
+                        <span><i class="bi bi-file-earmark-text"></i> {{ category.article_count }} 篇笔记</span>
+                    </div>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="cat-hero-actions">
+                    <a href="{% url 'notes:category_edit' category.pk %}" class="btn-ghost"><i class="bi bi-pencil"></i> 编辑</a>
+                    <a href="{% url 'notes:subcategory_create' category.pk %}" class="btn-glow"><i class="bi bi-plus-lg"></i> 新建小分区</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- SubCategories -->
+            {% for sub in category.subcategories.all %}
+            <section class="sub-section" id="sub-{{ sub.pk }}">
+                <div class="sub-head">
+                    <div class="sub-title">
+                        <div class="sub-marker" style="background: {{ category.color }}"></div>
+                        <h2>{{ sub.name }}</h2>
+                        <span class="sub-count">{{ sub.articles.count }} 篇</span>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="sub-actions">
+                        <a href="{% url 'notes:subcategory_edit' sub.pk %}" class="act-btn" title="编辑"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'notes:subcategory_delete' sub.pk %}" class="act-btn act-danger" title="删除"><i class="bi bi-trash3"></i></a>
+                        <a href="{% url 'notes:article_create' sub.pk %}" class="btn-glow btn-sm"><i class="bi bi-plus-lg"></i> 新建文章</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if sub.articles.all %}
+                <div class="article-list">
+                    {% for article in sub.articles.all %}
+                    <a href="{% url 'notes:article_detail' article.pk %}" class="art-row">
+                        {% if article.is_pinned %}<span class="art-pin"><i class="bi bi-pin-angle-fill"></i></span>{% endif %}
+                        <div class="art-row-main">
+                            <h4>{{ article.title }}</h4>
+                            <p>{{ article.summary|default:"" }}</p>
+                        </div>
+                        <div class="art-row-meta">
+                            <time><i class="bi bi-clock"></i> {{ article.updated_at|date:"Y-m-d" }}</time>
+                            <span class="art-arrow"><i class="bi bi-arrow-right-short"></i></span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-inline">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    暂无文章{% if user.is_authenticated %}，<a href="{% url 'notes:article_create' sub.pk %}">立即创建</a>{% endif %}
+                </div>
+                {% endif %}
+            </section>
+            {% empty %}
+            <div class="empty-hero" style="margin-top: 1.5rem;">
+                <div class="empty-icon"><i class="bi bi-folder-plus"></i></div>
+                <h3>还没有小分区</h3>
+                <p>创建小分区来组织你的笔记</p>
+                {% if user.is_authenticated %}<a href="{% url 'notes:subcategory_create' category.pk %}" class="btn-glow"><i class="bi bi-plus-lg"></i> 新建小分区</a>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
