@@ -240,6 +240,16 @@ ADMIN_HTML = r'''<!DOCTYPE html>
 <title>StudyNotes Editor</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Preview rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<!-- Site CSS for preview fidelity -->
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/code.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; background: #f2f8ee; color: #2a3729; }
@@ -289,12 +299,34 @@ body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; background: 
 .btn-save:disabled { background: #8a9b86; cursor: not-allowed; }
 .btn-delete { background: none; color: #d64560; border: 1px solid rgba(214,69,96,.3) !important; }
 .btn-delete:hover { background: rgba(214,69,96,.06); }
-.btn-preview { background: rgba(46,160,82,.08); color: #1f7f3f; }
+.btn-toggle { background: rgba(46,160,82,.08); color: #1f7f3f; }
+.btn-toggle.active { background: #1f7f3f; color: #fff; }
 .editor-body { flex: 1; display: flex; overflow: hidden; }
-.editor-body textarea { flex: 1; padding: 20px; border: none; resize: none; font-family: 'JetBrains Mono', monospace; font-size: .88rem; line-height: 1.7; background: #fafdf8; outline: none; }
-.editor-body .preview { flex: 1; padding: 20px; overflow-y: auto; border-left: 1px solid rgba(30,80,40,.08); display: none; }
-.editor-body.show-preview textarea { display: none; }
-.editor-body.show-preview .preview { display: block; }
+.editor-body textarea { flex: 1; padding: 20px; border: none; resize: none; font-family: 'JetBrains Mono', monospace; font-size: .88rem; line-height: 1.7; background: #fafdf8; outline: none; min-width: 0; }
+.editor-body .preview { flex: 1; padding: 24px 28px; overflow-y: auto; border-left: 1px solid rgba(30,80,40,.08); background: #fff; min-width: 0; }
+/* Preview content styling */
+.preview h1, .preview h2, .preview h3, .preview h4 { margin: 1.2em 0 .5em; color: #134f29; font-family: 'Inter','Noto Sans SC',sans-serif; }
+.preview h1 { font-size: 1.5rem; border-bottom: 1px solid rgba(30,80,40,.1); padding-bottom: .3em; }
+.preview h2 { font-size: 1.25rem; }
+.preview h3 { font-size: 1.08rem; }
+.preview p { margin: .6em 0; line-height: 1.8; font-size: .92rem; }
+.preview ul, .preview ol { margin: .5em 0; padding-left: 1.5em; }
+.preview li { margin: .25em 0; line-height: 1.7; font-size: .92rem; }
+.preview code { font-family: 'JetBrains Mono', monospace; font-size: .84rem; background: #f0f6ec; padding: 2px 6px; border-radius: 4px; color: #1f7f3f; }
+.preview pre { margin: 1em 0; border-radius: 10px; overflow: hidden; }
+.preview pre code { display: block; padding: 16px 20px; background: #f8faf6; border: 1px solid rgba(30,80,40,.08); border-radius: 10px; color: inherit; }
+.preview blockquote { border-left: 3px solid #2ea052; margin: 1em 0; padding: .5em 1em; background: rgba(46,160,82,.04); color: #536751; }
+.preview table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+.preview th, .preview td { border: 1px solid rgba(30,80,40,.12); padding: 8px 12px; font-size: .85rem; }
+.preview th { background: #f0f6ec; font-weight: 600; }
+.preview img { max-width: 100%; border-radius: 8px; margin: .5em 0; }
+.preview hr { border: none; border-top: 1px solid rgba(30,80,40,.1); margin: 1.5em 0; }
+.preview .katex-display { margin: 1em 0; overflow-x: auto; }
+/* View modes */
+.editor-body.only-editor .preview { display: none; }
+.editor-body.only-editor textarea { flex: 1; }
+.editor-body.only-preview textarea { display: none; }
+.editor-body.only-preview .preview { flex: 1; }
 
 /* ── Empty state ── */
 .empty-state { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #8a9b86; }
@@ -401,19 +433,35 @@ async function openArticle(path) {
         <div class="editor-wrap">
             <div class="editor-toolbar">
                 <h2><i class="bi bi-file-earmark-text"></i> ${title}</h2>
-                <button class="btn-preview" onclick="togglePreview()"><i class="bi bi-eye"></i> 预览</button>
+                <div style="display:flex;gap:4px;background:rgba(30,80,40,.06);border-radius:8px;padding:2px;">
+                    <button class="btn-toggle" id="btnBoth" onclick="setView('both')" title="分栏"><i class="bi bi-layout-split"></i></button>
+                    <button class="btn-toggle" id="btnEdit" onclick="setView('edit')" title="纯编辑"><i class="bi bi-code-slash"></i></button>
+                    <button class="btn-toggle" id="btnPreview" onclick="setView('preview')" title="纯预览"><i class="bi bi-eye"></i></button>
+                </div>
                 <button class="btn-delete" onclick="deleteArticle()"><i class="bi bi-trash3"></i> 删除</button>
                 <button class="btn-save" id="saveBtn" onclick="saveArticle()"><i class="bi bi-check-lg"></i> 保存</button>
             </div>
             <div class="editor-body" id="editorBody">
                 <textarea id="editor" spellcheck="false">${escHtml(data.content)}</textarea>
-                <div class="preview" id="previewPane"></div>
+                <div class="preview markdown-content" id="previewPane"></div>
             </div>
         </div>`;
-    document.getElementById('editor').addEventListener('input', () => { dirty = true; });
-    document.getElementById('editor').addEventListener('keydown', e => {
+    const editor = document.getElementById('editor');
+    editor.addEventListener('input', () => { dirty = true; renderPreview(); });
+    editor.addEventListener('keydown', e => {
         if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveArticle(); }
+        // Tab inserts spaces
+        if (e.key === 'Tab') { e.preventDefault(); const s=editor.selectionStart,en=editor.selectionEnd; editor.value=editor.value.substring(0,s)+'    '+editor.value.substring(en); editor.selectionStart=editor.selectionEnd=s+4; dirty=true; renderPreview(); }
     });
+    // Sync scroll
+    editor.addEventListener('scroll', () => {
+        const pane = document.getElementById('previewPane');
+        if (!pane) return;
+        const pct = editor.scrollTop / (editor.scrollHeight - editor.clientHeight || 1);
+        pane.scrollTop = pct * (pane.scrollHeight - pane.clientHeight);
+    });
+    setView('both');
+    renderPreview();
     // Highlight sidebar
     document.querySelectorAll('.art-item').forEach(el => el.classList.remove('active'));
     const active = document.querySelector(`.art-item[data-path="${path}"]`);
@@ -466,13 +514,61 @@ async function deleteFolder(path, name) {
     loadTree();
 }
 
-function togglePreview() {
-    const body = document.getElementById('editorBody');
-    body.classList.toggle('show-preview');
-    if (body.classList.contains('show-preview')) {
-        const md = document.getElementById('editor').value;
-        document.getElementById('previewPane').innerHTML = '<p style="color:#8a9b86;text-align:center;padding:2rem;">预览需保存后在站点查看，或在此查看原始 Markdown</p><pre style="white-space:pre-wrap;font-size:.85rem;line-height:1.6;padding:1rem;">' + escHtml(md) + '</pre>';
+let _renderTimer = null;
+function renderPreview() {
+    clearTimeout(_renderTimer);
+    _renderTimer = setTimeout(_doRender, 150);
+}
+function _doRender() {
+    const pane = document.getElementById('previewPane');
+    const editor = document.getElementById('editor');
+    if (!pane || !editor) return;
+    let md = editor.value;
+    // Strip YAML front matter for preview
+    if (md.startsWith('---')) {
+        const end = md.indexOf('---', 3);
+        if (end > 0) md = md.substring(end + 3).trim();
     }
+    // Protect math from marked.js
+    const mathBlocks = [], mathInlines = [];
+    md = md.replace(/\$\$([\s\S]+?)\$\$/g, (m) => { mathBlocks.push(m); return '\x00MBLOCK_'+(mathBlocks.length-1)+'\x00'; });
+    md = md.replace(/\\\[([\s\S]+?)\\\]/g, (m) => { mathBlocks.push(m); return '\x00MBLOCK_'+(mathBlocks.length-1)+'\x00'; });
+    md = md.replace(/(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)/g, (m) => { mathInlines.push(m); return '\x00MINLINE_'+(mathInlines.length-1)+'\x00'; });
+    md = md.replace(/\\\((.+?)\\\)/g, (m) => { mathInlines.push(m); return '\x00MINLINE_'+(mathInlines.length-1)+'\x00'; });
+    // Render markdown
+    let html = marked.parse(md, { breaks: false, gfm: true, highlight: (code, lang) => {
+        if (lang && hljs.getLanguage(lang)) return hljs.highlight(code, {language: lang}).value;
+        return hljs.highlightAuto(code).value;
+    }});
+    // Restore math
+    mathBlocks.forEach((m, i) => { html = html.replace('\x00MBLOCK_'+i+'\x00', m); });
+    mathInlines.forEach((m, i) => { html = html.replace('\x00MINLINE_'+i+'\x00', m); });
+    pane.innerHTML = html;
+    // Render KaTeX
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(pane, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\[', right: '\\]', display: true},
+                {left: '\\(', right: '\\)', display: false}
+            ],
+            throwOnError: false
+        });
+    }
+}
+
+let currentView = 'both';
+function setView(mode) {
+    currentView = mode;
+    const body = document.getElementById('editorBody');
+    body.classList.remove('only-editor', 'only-preview');
+    if (mode === 'edit') body.classList.add('only-editor');
+    if (mode === 'preview') body.classList.add('only-preview');
+    document.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('active'));
+    const btn = {both:'btnBoth', edit:'btnEdit', preview:'btnPreview'}[mode];
+    document.getElementById(btn)?.classList.add('active');
+    if (mode !== 'edit') renderPreview();
 }
 
 // ── Modals ──
