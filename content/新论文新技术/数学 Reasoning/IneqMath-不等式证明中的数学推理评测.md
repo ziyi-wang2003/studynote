@@ -2,7 +2,7 @@
 title: IneqMath：不等式证明中的数学推理评测
 summary: NeurIPS 2025 Spotlight 论文 IneqMath 将不等式证明拆成可验证的 bound estimation 与 relation prediction，并用细粒度 LLM-as-judge 揭示当前推理模型“答案会对、证明会错”的核心短板。
 created: '2026-04-30 00:00:00+08:00'
-updated: '2026-04-30 00:00:00+08:00'
+updated: '2026-04-30 01:19:35+08:00'
 order: 1
 pinned: false
 year: 2025
@@ -118,6 +118,8 @@ IneqMath 的评测不是一个 judge 全包，而是模块化地拆成五个判�
 ![IneqMath 答案与证明正确率差距](/static/images/uploads/数学 Reasoning/ineqmath-answer-proof-gap.png)
 
 ## 图文并茂的讲解
+
+本节三张辅助插图已重新使用 GPT 的 AI 图片生成功能绘制，并保存到站点的 `static/images/uploads/数学 Reasoning/` 目录下。
 
 ### 图 1：为什么要把 proof 改成两个可检查任务
 
