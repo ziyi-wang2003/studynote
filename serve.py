@@ -291,7 +291,7 @@ body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; background: 
 .sidebar-bottom button:hover { border-color: #1f7f3f; color: #1f7f3f; background: rgba(46,160,82,.04); }
 
 /* ── Editor ── */
-.editor-wrap { flex: 1; display: flex; flex-direction: column; }
+.editor-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .editor-toolbar { padding: 12px 20px; background: #fff; border-bottom: 1px solid rgba(30,80,40,.08); display: flex; align-items: center; gap: 12px; }
 .editor-toolbar h2 { font-size: 1rem; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .editor-toolbar button { padding: 6px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: .82rem; font-weight: 500; }
@@ -302,9 +302,9 @@ body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; background: 
 .btn-delete:hover { background: rgba(214,69,96,.06); }
 .btn-toggle { background: rgba(46,160,82,.08); color: #1f7f3f; }
 .btn-toggle.active { background: #1f7f3f; color: #fff; }
-.editor-body { flex: 1; display: flex; overflow: hidden; }
-.editor-body textarea { flex: 1; padding: 20px; border: none; resize: none; font-family: 'JetBrains Mono', monospace; font-size: .88rem; line-height: 1.7; background: #fafdf8; outline: none; min-width: 0; }
-.editor-body .preview { flex: 1; padding: 24px 28px; overflow-y: auto; border-left: 1px solid rgba(30,80,40,.08); background: #fff; min-width: 0; }
+.editor-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+.editor-body textarea { flex: 1; padding: 20px; border: none; resize: none; font-family: 'JetBrains Mono', monospace; font-size: .88rem; line-height: 1.7; background: #fafdf8; outline: none; min-width: 0; overflow-y: auto; }
+.editor-body .preview { flex: 1; padding: 24px 28px; overflow-y: auto; border-left: 1px solid rgba(30,80,40,.08); background: #fff; min-width: 0; min-height: 0; }
 /* Preview content styling */
 .preview h1, .preview h2, .preview h3, .preview h4 { margin: 1.2em 0 .5em; color: #134f29; font-family: 'Inter','Noto Sans SC',sans-serif; }
 .preview h1 { font-size: 1.5rem; border-bottom: 1px solid rgba(30,80,40,.1); padding-bottom: .3em; }
