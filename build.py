@@ -74,11 +74,11 @@ def _restore_math(html, blocks, inlines):
     return html
 
 
-def convert_obsidian_images(text):
+def convert_obsidian_images(text, root='/'):
     def replace_image(m):
         path = m.group(1).strip()
         alt = path.split('/')[-1]
-        return f'![{alt}](static/images/{path})'
+        return f'![{alt}]({root}static/images/{path})'
     return re.sub(r'!\[\[([^\]]+\.(?:png|jpg|jpeg|gif|svg|webp))\]\]', replace_image, text, flags=re.IGNORECASE)
 
 
@@ -112,8 +112,12 @@ def render_markdown(text, root=''):
         return ''
     # Rewrite legacy Django media paths to static
     text = text.replace('/media/images/', f'{root}static/images/')
-    text = convert_obsidian_images(text)
+    text = convert_obsidian_images(text, root=root or '/')
     text = convert_obsidian_links(text)
+    # Rewrite absolute /static/images/ paths to include BASE_URL prefix
+    if root and root != '/':
+        text = text.replace('](/static/images/', f']({root}static/images/')
+        text = text.replace('src="/static/images/', f'src="{root}static/images/')
     text = _ensure_blank_before_blocks(text)
     text, math_blocks, math_inlines = _protect_math(text)
 

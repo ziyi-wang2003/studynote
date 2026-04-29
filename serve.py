@@ -156,8 +156,34 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         length = int(self.headers.get('Content-Length', 0))
-        body = json.loads(self.rfile.read(length)) if length else {}
         path = urllib.parse.urlparse(self.path).path
+
+        if path == '/_admin/api/upload-image':
+            # Handle image upload (raw binary with filename in header)
+            content_type = self.headers.get('Content-Type', '')
+            filename = self.headers.get('X-Filename', '')
+            if not filename:
+                filename = f'img_{int(time.time())}.png'
+            # Sanitize filename
+            filename = re.sub(r'[\\/:*?"<>|]', '_', filename)
+            img_dir = STATIC_DIR / 'images' / 'uploads'
+            img_dir.mkdir(parents=True, exist_ok=True)
+            dest = img_dir / filename
+            # Avoid overwriting
+            if dest.exists():
+                stem, ext = os.path.splitext(filename)
+                filename = f'{stem}_{int(time.time())}{ext}'
+                dest = img_dir / filename
+            data = self.rfile.read(length)
+            dest.write_bytes(data)
+            # Also copy to docs/static for immediate local preview
+            docs_img_dir = OUTPUT_DIR / 'static' / 'images' / 'uploads'
+            docs_img_dir.mkdir(parents=True, exist_ok=True)
+            (docs_img_dir / filename).write_bytes(data)
+            self._send_json({'ok': True, 'path': f'/static/images/uploads/{filename}'})
+            return
+
+        body = json.loads(self.rfile.read(length)) if length else {}
 
         if path == '/_admin/api/save':
             rel = body.get('path', '')
@@ -298,6 +324,8 @@ body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; background: 
 .btn-save { background: #1f7f3f; color: #fff; }
 .btn-save:hover { background: #186432; }
 .btn-save:disabled { background: #8a9b86; cursor: not-allowed; }
+.btn-upload { background: none; color: #1f7f3f; border: 1px solid rgba(31,127,63,.3) !important; }
+.btn-upload:hover { background: rgba(31,127,63,.06); }
 .btn-delete { background: none; color: #d64560; border: 1px solid rgba(214,69,96,.3) !important; }
 .btn-delete:hover { background: rgba(214,69,96,.06); }
 .btn-toggle { background: rgba(46,160,82,.08); color: #1f7f3f; }
@@ -439,6 +467,8 @@ async function openArticle(path) {
                     <button class="btn-toggle" id="btnEdit" onclick="setView('edit')" title="纯编辑"><i class="bi bi-code-slash"></i></button>
                     <button class="btn-toggle" id="btnPreview" onclick="setView('preview')" title="纯预览"><i class="bi bi-eye"></i></button>
                 </div>
+                <button class="btn-upload" onclick="uploadImage()" title="上传图片"><i class="bi bi-image"></i> 图片</button>
+                <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
                 <button class="btn-delete" onclick="deleteArticle()"><i class="bi bi-trash3"></i> 删除</button>
                 <button class="btn-save" id="saveBtn" onclick="saveArticle()"><i class="bi bi-check-lg"></i> 保存</button>
             </div>
@@ -471,6 +501,31 @@ async function openArticle(path) {
 
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+function uploadImage() { document.getElementById('imgInput').click(); }
+async function handleImageUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    try {
+        const resp = await fetch(API + '/upload-image', {
+            method: 'POST',
+            headers: { 'Content-Type': file.type, 'X-Filename': file.name },
+            body: file
+        });
+        const data = await resp.json();
+        if (data.ok) {
+            const editor = document.getElementById('editor');
+            const pos = editor.selectionStart;
+            const tag = `![${file.name}](${data.path})`;
+            editor.value = editor.value.substring(0, pos) + tag + editor.value.substring(editor.selectionEnd);
+            editor.selectionStart = editor.selectionEnd = pos + tag.length;
+            dirty = true;
+            renderPreview();
+        } else {
+            alert('上传失败: ' + (data.error || '未知错误'));
+        }
+    } catch(e) { alert('上传出错: ' + e.message); }
+    input.value = '';
+}
 async function saveArticle() {
     if (!currentPath) return;
     const content = document.getElementById('editor').value;
