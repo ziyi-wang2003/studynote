@@ -252,6 +252,7 @@ ADMIN_HTML = r'''<!DOCTYPE html>
 <link rel="stylesheet" href="/static/css/code.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
 body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; background: #f2f8ee; color: #2a3729; }
 
 /* ── Top bar ── */
