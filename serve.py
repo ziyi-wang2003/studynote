@@ -530,6 +530,12 @@ function _doRender() {
         const end = md.indexOf('---', 3);
         if (end > 0) md = md.substring(end + 3).trim();
     }
+    // Rewrite image paths for local preview
+    md = md.replace(/!\[\[([^\]]+\.(?:png|jpg|jpeg|gif|svg|webp))\]\]/gi, (m, p) => {
+        const alt = p.split('/').pop();
+        return `![${alt}](/static/images/${p})`;
+    });
+    md = md.replace(/\/media\/images\//g, '/static/images/');
     // Protect math from marked.js
     const mathBlocks = [], mathInlines = [];
     md = md.replace(/\$\$([\s\S]+?)\$\$/g, (m) => { mathBlocks.push(m); return '\x00MBLOCK_'+(mathBlocks.length-1)+'\x00'; });
