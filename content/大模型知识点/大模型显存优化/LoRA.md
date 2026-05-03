@@ -4,7 +4,7 @@ order: 5
 pinned: false
 summary: ''
 title: LoRA
-updated: '2026-04-24 13:04:14.662481+00:00'
+updated: '2026-05-01 01:02:19+08:00'
 ---
 
 ## LoRA：从低秩假设到参数高效微调生态
@@ -16,6 +16,10 @@ updated: '2026-04-24 13:04:14.662481+00:00'
 #### 1.1 低秩假设（Low-Rank Hypothesis）
 
 LoRA（Low-Rank Adaptation，发表在 ICLR 2022）的核心洞察来源于一项实证观察：对下游任务进行微调时，预训练模型权重矩阵的更新量 $\Delta \mathbf{W} = \mathbf{W}_{\text{fine-tuned}} - \mathbf{W}_{\text{pretrained}}$ 虽然具有很高的矩阵秩（full rank），但其绝大多数能量集中在低维子空间内，因而可以通过低秩分解高效表示。换言之，模型适配新任务并不需要更新全部参数，只需在一个低维子空间内调整即可实现。**这一假设意味着全参数微调中的大部分参数更新是冗余的，可以被紧凑地表示**。
+
+![LoRA 低秩旁路与变体生态](/static/images/uploads/大模型显存优化/lora-peft-variants-map.png)
+
+图中左侧是标准 LoRA 的核心结构：冻结原始权重 \(W_0\)，只训练低秩旁路 \(A\) 和 \(B\)，用 \(\Delta W = BA\) 表示任务增量，部署时可把增量合并回权重。右侧把几个常见变体按改进目标组织起来：QLoRA 主要压缩基座显存，DoRA 增强表达能力，AdaLoRA 动态分配秩预算，VeRA/LoRA-FA 进一步减少可训练参数，PiSSA/AILoRA 则从初始化和主成分先验改善收敛。
 
 ### 2 核心数学原理与形式定义
 

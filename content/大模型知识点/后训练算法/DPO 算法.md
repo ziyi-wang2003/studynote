@@ -4,14 +4,16 @@ order: 1
 pinned: false
 summary: 人类偏好对齐
 title: DPO 算法
-updated: '2026-04-22 14:41:04.070109+00:00'
+updated: '2026-04-30 22:20:02+08:00'
 ---
 
 > DPO（Direct Preference Optimization）是 2023 年 Rafailov 等人提出的一种偏好学习算法。它的卖点可以用一句话概括：**把 RLHF 里"先训 reward model 再跑 PPO"这两步合成一步监督学习**。数学上它不是一个经验性技巧，而是一个等价变换——在 KL 正则化 RL 这个具体设定下，最优策略和 reward 之间有一个闭式关系，把它反代进 Bradley-Terry 偏好模型，RL 那一步就消失了，剩下一个长得像二分类交叉熵的 loss。理解 DPO 的难点不在代码，在推导：一旦看懂"reward 可以用策略反解出来"这一步，后面全是顺推。
 
 这篇笔记的组织是：先交代它要替掉的东西（RLHF 里的 PPO 阶段），然后把整个推导走一遍，再说这个目标到底在优化什么、和 PPO 的差别在哪、工程上有哪些细节绕不开、典型的 failure mode 是什么样、后续的 IPO/KTO/SimPO/ORPO 又在修什么。
 
-![image.png](/media/images/uploads/image_5.png)
+![DPO 推导与训练流程](/static/images/uploads/后训练算法/dpo-derivation-flow.png)
+
+图中把 DPO 的主链路压成一张图：同一个 prompt 下的赢家 $y_w$ 和输家 $y_l$ 分别经过冻结参考策略 $\pi_{\text{ref}}$ 与待训练策略 $\pi_\theta$ 计算 log probability，再用两边的 log-ratio 差构造隐式奖励差，最后进入 sigmoid / BCE-like 的 DPO 损失。左下角的 $Z(x)$ 抵消对应推导里最关键的一步：归一化常数与候选回答无关，所以在 $y_w$ 和 $y_l$ 做差时自动消失。
 
 ## 1. 从 RLHF 到 DPO：要替掉的是什么
 
@@ -157,6 +159,10 @@ $$
 ## 6. DPO 的典型 failure mode
 
 DPO 发表后的两年里，社区陆续发现了一批它特有的坑。这些不是实现 bug，是算法本身的结构性问题。理解它们比会写 loss 重要得多。
+
+![DPO 常见失效模式与原因诊断](/static/images/uploads/后训练算法/dpo-failure-modes.png)
+
+这张诊断图对应下面几类 failure mode：DPO 只优化偏好差值，所以赢家概率也可能下降；离线偏好数据覆盖不到策略漂移后的新分布；长短回答的 log probability 求和尺度不同，会把长度误当作偏好；错标样本会直接把策略往反方向推；$\beta$ 同时控制偏离参考模型的幅度和学习保守程度，因此过小或过大都会出问题。
 
 **(1) Chosen probability 反而下降。** 这是最著名也最反直觉的现象。你训完 DPO，查一下 $\pi_\theta(y_w|x)$ vs $\pi_{\text{ref}}(y_w|x)$，常常会发现**赢家的概率也下降了**——只是下降得比 $y_l$ 少。DPO loss 只约束二者的差（$\hat r_w > \hat r_l$），没约束绝对 likelihood。一条把 $y_l$ 压得很猛、顺便把 $y_w$ 也压一点的路径，loss 照样降。极端情况下整个策略分布向"什么都不想生成"的方向塌缩，生成质量反而变差。
 

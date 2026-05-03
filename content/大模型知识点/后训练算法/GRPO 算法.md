@@ -4,13 +4,15 @@ order: 2
 pinned: false
 summary: deepseek 宇宙
 title: GRPO 算法
-updated: '2026-04-22 14:24:22.475535+00:00'
+updated: '2026-04-30 22:20:02+08:00'
 ---
 
 > **Group Relative Policy Optimization（群组相对策略优化）**
 > 由 DeepSeek 团队在 DeepSeekMath（2024）论文中提出，并在 DeepSeek-R1 中被广泛使用，成为当前大模型强化学习训练的主流算法之一。
 
-![image.png](/media/images/uploads/image_4.png)
+![GRPO 训练流程](/static/images/uploads/后训练算法/grpo-training-flow.png)
+
+图中展示了 GRPO 一个训练 step 的完整数据流：同一 prompt 先由旧策略采样出 $G$ 条回答，再用奖励模型或规则验证器打分，组内计算均值 $\mu$ 和标准差 $\sigma$ 得到相对优势 $A_i$，随后把样本级优势广播到 token 级，结合 clip loss 与参考模型 KL 项更新当前策略。左下角被划掉的 critic 是 GRPO 相比 PPO 最核心的工程收益。
 
 ---
 
@@ -98,6 +100,10 @@ PPO：  prompt ──► 1 个输出 ──► reward ──► Advantage（需 
 GRPO： prompt ──► G 个输出 ──► G 个 reward ──► 组内归一化 ──► Advantage
                                                                        （无需 Critic）
 ```
+
+![PPO、GRPO 与 GRPO 改进对比](/static/images/uploads/后训练算法/grpo-ppo-variants-comparison.png)
+
+这张对比图把 PPO、原版 GRPO 和后续 GRPO 改进放在同一坐标里：PPO 的优势估计依赖 critic，显存压力更高；GRPO 用同一 prompt 的组内奖励替代 critic，但采样成本上升；Dr.GRPO、DAPO、GSPO 等改进继续处理长度偏差、无效组过滤和序列级比值等问题，因此更适合长 CoT 与大规模推理 RL。
 
 ---
 

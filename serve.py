@@ -85,13 +85,16 @@ def _load_meta(path):
 def _quick_title(md_path):
     """Read just the title from front-matter without parsing the whole file."""
     with open(md_path, 'r', encoding='utf-8') as f:
-        head = f.read(500)
+        head = f.read(4096)
     if head.startswith('---'):
         parts = head.split('---', 2)
-        if len(parts) >= 2:
-            fm = yaml.safe_load(parts[1])
-            if fm and 'title' in fm:
-                return fm['title']
+        if len(parts) >= 3:
+            try:
+                fm = yaml.safe_load(parts[1])
+                if fm and 'title' in fm:
+                    return fm['title']
+            except Exception:
+                pass
     return md_path.stem
 
 
@@ -253,7 +256,8 @@ class Handler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def log_message(self, fmt, *args):
-        if '/_admin/' not in (args[0] if args else ''):
+        first = str(args[0]) if args else ''
+        if '/_admin/' not in first:
             super().log_message(fmt, *args)
 
 
@@ -273,6 +277,7 @@ ADMIN_HTML = r'''<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <!-- Site CSS for preview fidelity -->
 <link rel="stylesheet" href="/static/css/tokens.css">
 <link rel="stylesheet" href="/static/css/code.css">
@@ -397,6 +402,7 @@ body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; background: 
 </div>
 
 <script>
+mermaid.initialize({ startOnLoad: false, theme: 'forest' });
 const API = '/_admin/api';
 let currentPath = null;
 let dirty = false;
@@ -617,6 +623,19 @@ function _doRender() {
             ],
             throwOnError: false
         });
+    }
+    // Render Mermaid diagrams
+    if (typeof mermaid !== 'undefined') {
+        pane.querySelectorAll('pre code.language-mermaid').forEach(function(code) {
+            var pre = code.parentElement;
+            var div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = code.textContent;
+            pre.parentNode.replaceChild(div, pre);
+        });
+        if (pane.querySelector('.mermaid')) {
+            mermaid.run({ nodes: pane.querySelectorAll('.mermaid') });
+        }
     }
 }
 

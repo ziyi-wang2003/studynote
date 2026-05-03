@@ -34,7 +34,7 @@ TEMPLATE_DIR = ROOT / 'templates'
 # Set via env var or CLI arg:  python build.py /studynote/
 # For user.github.io root deployment, leave empty.
 BASE_URL = os.environ.get('BASE_URL', '').strip('/')
-if len(sys.argv) > 1:
+if len(sys.argv) > 1 and not sys.argv[1].isdigit():
     BASE_URL = sys.argv[1].strip('/')
 if BASE_URL:
     BASE_URL = '/' + BASE_URL + '/'
@@ -46,6 +46,7 @@ OUTPUT_DIR = ROOT / 'docs'
 # ── Markdown helpers (ported from Django templatetags) ─────
 _MATH_BLOCK_PH = '\x00MATHBLOCK_%d\x00'
 _MATH_INLINE_PH = '\x00MATHINLINE_%d\x00'
+_MERMAID_PH = '\x00MERMAID_%d\x00'
 
 
 def _protect_math(text):
@@ -119,6 +120,14 @@ def render_markdown(text, root=''):
         text = text.replace('](/static/images/', f']({root}static/images/')
         text = text.replace('src="/static/images/', f'src="{root}static/images/')
     text = _ensure_blank_before_blocks(text)
+
+    # Protect mermaid code blocks from codehilite
+    mermaid_blocks = []
+    def _save_mermaid(m):
+        mermaid_blocks.append(m.group(1))
+        return _MERMAID_PH % (len(mermaid_blocks) - 1)
+    text = re.sub(r'```mermaid\s*\n(.*?)```', _save_mermaid, text, flags=re.DOTALL)
+
     text, math_blocks, math_inlines = _protect_math(text)
 
     converter = md_lib.Markdown(extensions=[
@@ -138,6 +147,11 @@ def render_markdown(text, root=''):
     html = converter.convert(text)
     html = add_heading_ids(html)
     html = _restore_math(html, math_blocks, math_inlines)
+    # Restore mermaid blocks as renderable divs
+    for i, block in enumerate(mermaid_blocks):
+        html = html.replace(_MERMAID_PH % i, f'<div class="mermaid">{block}</div>')
+        # Also clean up if markdown wrapped placeholder in a <p>
+        html = html.replace(f'<p><div class="mermaid">{block}</div></p>', f'<div class="mermaid">{block}</div>')
     return html
 
 

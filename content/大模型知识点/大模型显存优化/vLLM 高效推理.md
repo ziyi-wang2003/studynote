@@ -4,7 +4,7 @@ order: 2
 pinned: false
 summary: ''
 title: vLLM 高效推理
-updated: '2026-04-24 12:52:39.768197+00:00'
+updated: '2026-05-01 01:02:19+08:00'
 ---
 
 ## vLLM：面向高吞吐量大模型推理的系统设计
@@ -16,6 +16,10 @@ updated: '2026-04-24 12:52:39.768197+00:00'
 vLLM 是一个专为高吞吐量 LLM 服务设计的推理框架，其核心贡献在于**将操作系统级别的虚拟内存与分页管理思想引入大模型推理系统**。vLLM 的工作始于 2023 年 SOSP 论文《Efficient Memory Management for Large Language Model Serving with PagedAttention》，在随后的发展中持续演进，目前已成为业界广泛部署的高性能推理后端。该框架与 FlashAttention 的分工明确：FlashAttention 聚焦于**单请求内的注意力计算内核优化**，而 vLLM 则着力于**请求间的系统级资源调度与复用**。二者在部署时通常协同工作，共同构成高吞吐量推理服务的核心技术栈。
 
 本章将依次剖析 vLLM 的三个核心机制——**PagedAttention**（分页注意力，解决内存碎片与过度预留问题）、**Continuous Batching**（持续批处理，解决静态批处理的低效等待问题）以及 **Automatic Prefix Caching**（自动前缀缓存，解决前缀重复计算问题），并阐释它们之间如何协同运作，共同实现数量级的吞吐量提升。
+
+![vLLM PagedAttention 与持续批处理系统图](/static/images/uploads/大模型显存优化/vllm-pagedattention-scheduler.png)
+
+图中把 vLLM 的三项机制统一到“KV 块”抽象上：PagedAttention 用块表把每个请求的逻辑块映射到非连续的物理块池，减少连续预留和碎片；Continuous Batching 在每个 decode step 动态移除已完成请求并接纳新请求，让 GPU 计算槽位持续被填满；Automatic Prefix Caching 通过哈希表和引用计数复用相同前缀块，分支生成时再用写时复制处理不同后缀。
 
 ### 2 经典 KV Cache 的内存管理困境
 

@@ -85,6 +85,22 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
     <script src="{{ root }}static/js/main.js"></script>
     <script src="{{ root }}static/js/forest_motion.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Convert ```mermaid code blocks into mermaid-renderable divs
+        document.querySelectorAll('pre code.language-mermaid, pre code.highlight-mermaid').forEach(function(code) {
+            var pre = code.parentElement;
+            var div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = code.textContent;
+            pre.parentNode.replaceChild(div, pre);
+        });
+        if (document.querySelector('.mermaid')) {
+            mermaid.initialize({ startOnLoad: true, theme: 'forest' });
+        }
+    });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

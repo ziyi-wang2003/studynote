@@ -4,7 +4,7 @@ order: 1
 pinned: false
 summary: ''
 title: Flash Attention 家族
-updated: '2026-04-24 12:47:31.677188+00:00'
+updated: '2026-05-01 01:02:19+08:00'
 ---
 
 ## Flash Attention: 从 IO 感知到硬件极致利用
@@ -22,6 +22,10 @@ Transformer 中的自注意力机制计算流程为
 然而，计算量并非唯一的瓶颈。在 GPU 的存储层次中，**高带宽内存**（High Bandwidth Memory, HBM）容量大（如 A100 为 40–80GB）但带宽约 1.5–2.0 TB/s；**片上 SRAM** 容量小（每 SM 约 192KB，总计约 20MB）但带宽可达约 19 TB/s——差距约一个数量级。在 A100 上，从 HBM 读取数据比从 SRAM 读取慢约 15 倍。
 
 朴素注意力实现将 \(\mathbf{S}\) 写入 HBM，读回计算 softmax，将 \(\mathbf{P}\) 重新写入 HBM，再读回与 \(\mathbf{V}\) 相乘。**大量 HBM 访问的实际开销远超浮点运算本身**，使注意力机制受限于内存带宽（memory-bound），而非计算能力（compute-bound）。在 GPU 持续增加的 FLOPS 与相对滞后的内存带宽之间，这一矛盾日益突出。
+
+![FlashAttention IO 感知分块计算](/static/images/uploads/大模型显存优化/flashattention-io-aware-tiling.png)
+
+图中左侧是朴素注意力的瓶颈：完整 \(N \times N\) 分数矩阵和 softmax 矩阵反复写入、读出 HBM。中间的 FlashAttention 把 Q/K/V 切成 tile 放入片上 SRAM，在块内完成打分、mask、在线 softmax 和输出累积，只保存每行的少量统计量而不物化完整注意力矩阵。右侧时间线对应家族演进：V1 解决 IO，V2 提升并行效率，V3 进一步利用 Hopper 的异步执行和 FP8 能力。
 
 ### 2 FlashAttention (V1)：IO 感知的精确注意力
 

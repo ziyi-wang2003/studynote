@@ -4,7 +4,7 @@ order: 3
 pinned: false
 summary: ZeRO 分片
 title: DeepSpeed
-updated: '2026-04-24 12:56:08.993218+00:00'
+updated: '2026-05-01 01:02:19+08:00'
 ---
 
 ## DeepSpeed ZeRO：大模型训练的显存优化与数据并行扩展
@@ -52,6 +52,10 @@ ZeRO 将模型状态划分为三类：
 - **ZeRO-1**（\(P_{os}\)）：仅分片优化器状态 \(O\)。
 - **ZeRO-2**（\(P_{os+g}\)）：分片优化器状态 \(O\) + 梯度 \(G\)。
 - **ZeRO-3**（\(P_{os+g+p}\)）：分片优化器状态 \(O\) + 梯度 \(G\) + 参数 \(\Theta\)。
+
+![DeepSpeed ZeRO 分片阶段对比](/static/images/uploads/大模型显存优化/deepspeed-zero-stages.png)
+
+图中从标准数据并行的“每卡完整副本”开始，逐级展示 ZeRO 的冗余消除路径：ZeRO-1 先切优化器状态，ZeRO-2 继续切梯度，ZeRO-3 连参数也分片，只在当前层计算前按需 all-gather，并在计算后释放临时副本。右侧的 CPU RAM 与 NVMe SSD 对应 ZeRO-Offload / ZeRO-Infinity，用更慢但更大的存储层扩展模型状态容量。
 
 每个阶段都对通信量和存储冗余有不同影响。下面分别详述。
 

@@ -4,7 +4,7 @@ order: 3
 pinned: false
 summary: GRPO 改进
 title: DAPO&DR.GRPO&GSPO
-updated: '2026-04-22 15:16:21.448008+00:00'
+updated: '2026-04-30 22:20:02+08:00'
 ---
 
 > 本文详细解读三篇 GRPO 改进的代表性工作：
@@ -30,6 +30,10 @@ updated: '2026-04-22 15:16:21.448008+00:00'
 - **Dr.GRPO** 说：GRPO 的公式本身就有偏差，需要先"纠偏"；
 - **DAPO** 说：GRPO 在大规模长 CoT 场景下训练不稳，需要一系列工程补丁；
 - **GSPO** 说：GRPO 在 token 级做重要性采样是理论错误，需要在序列级重新定义。
+
+![GRPO 改进谱系](/static/images/uploads/后训练算法/grpo-evolution-spectrum.png)
+
+这张谱系图把三条改进线索放在一起：Dr.GRPO 是数学层纠偏，主要移除长度归一化和标准差归一化带来的偏差；DAPO 是工程层补强，把裁剪、采样、loss 聚合和超长惩罚做成可规模化训练的四件套；GSPO 是理论层重构，把 token 级重要性比替换成序列级比值，让奖励粒度、裁剪粒度和优化目标重新对齐。
 
 ---
 
@@ -162,6 +166,10 @@ loss = policy_loss.sum() / (batch_size * max_length_or_constant)
 4. **Overlong Reward Shaping**：超长响应的软惩罚
 
 此外 DAPO **彻底去掉了 KL 散度项**，认为长 CoT 任务中策略分布本就需要大幅偏离初始模型。
+
+![DAPO 四件套](/static/images/uploads/后训练算法/dapo-four-components.png)
+
+图中把 DAPO 的四个组件按作用位置拆开：Clip-Higher 负责放宽上裁剪边界以保留探索熵；Dynamic Sampling 过滤全对或全错的零优势组，提升有效梯度比例；Token-Level Loss 把长 CoT 的每个 token 都纳入同一平均，避免长推理被稀释；Overlong Reward Shaping 在长度缓冲区内给软惩罚，减少硬截断带来的奖励噪声。
 
 ### 3.2 Clip-Higher：解耦裁剪上下界
 
@@ -396,7 +404,7 @@ $$
 GRPO 的 token 级重要性比：
 
 $$
-r_{i,t}(\theta) = \frac{\pi_\theta(o_{i,t} \mid q, o_{i,<t})}{\pi_{\theta_{\text{old}}}(o_{i,t} \mid q, o_{i,<t})}
+r_{i,t}(\theta) = \frac{\pi_\theta(o_{i,t} \mid q, o_{i \lt t})}{\pi_{\theta_{\text{old}}}(o_{i,t} \mid q, o_{i \lt t})}
 $$
 
 在每个 $(q, o_{i,<t})$ 上下文下，**我们只有一个 token 样本 $o_{i,t}$**！这不满足"多样本平均"的前提，该 IS 权重几乎等同于**纯噪声**。
@@ -419,7 +427,7 @@ GSPO 重新定义重要性比，**基于整个序列的似然**：
 
 $$
 \boxed{
-s_i(\theta) = \left(\frac{\pi_\theta(y_i \mid x)}{\pi_{\theta_{\text{old}}}(y_i \mid x)}\right)^{\frac{1}{|y_i|}} = \exp\left(\frac{1}{|y_i|} \sum_{t=1}^{|y_i|} \log \frac{\pi_\theta(y_{i,t} \mid x, y_{i,<t})}{\pi_{\theta_{\text{old}}}(y_{i,t} \mid x, y_{i,<t})}\right)
+s_i(\theta) = \left(\frac{\pi_\theta(y_i \mid x)}{\pi_{\theta_{\text{old}}}(y_i \mid x)}\right)^{\frac{1}{|y_i|}} = \exp\left(\frac{1}{|y_i|} \sum_{t=1}^{|y_i|} \log \frac{\pi_\theta(y_{i,t} \mid x, y_{i,\lt t})}{\pi_{\theta_{\text{old}}}(y_{i,t} \mid x, y_{i,\lt t})}\right)
 }
 $$
 
