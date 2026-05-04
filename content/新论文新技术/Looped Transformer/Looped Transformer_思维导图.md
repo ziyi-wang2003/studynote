@@ -32,11 +32,16 @@ mindmap
         KV sharing
         Pareto frontier
     Training signals
-      RLTT
-        trajectory reward
-        dense credit
-        Ouro thinking
-        math transfer
+      Prioritize the Process, Not Just the Outcome
+        RLTT
+          trajectory-level credit
+          per-loop distributions
+          GRPO replacement
+          Ouro-2.6B-Thinking
+          math transfer
+        Process supervision alternatives
+          LSRL
+          external verifier
     Interpretability
       SDI
         step attribution
