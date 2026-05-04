@@ -2,7 +2,7 @@
 title: 数学 Reasoning 思维导图
 summary: 数学推理方向论文与技术路线的 Mermaid 思维导图。
 created: '2026-04-30 00:00:00+08:00'
-updated: '2026-04-30 00:00:00+08:00'
+updated: '2026-05-04 00:00:00+08:00'
 order: 99
 pinned: false
 ---
@@ -44,6 +44,16 @@ mindmap
         WizardMath
         process supervision
         theorem-guided reasoning
+      Latent recurrent reasoning
+        LoopFormer
+          elastic depth
+          shortcut consistency
+          budget-conditioned loops
+        Ouro LoopLM
+          large-scale looped LM
+          learned depth allocation
+        Mixture-of-Recursions
+          token-level recursive depth
     代表论文
       rStar-Math
         小模型自演化数学推理
@@ -51,10 +61,16 @@ mindmap
         NeurIPS 2025 Spotlight
         答案正确不代表证明正确
         细粒度过程 judge
+      LoopFormer
+        ICLR 2026
+        可变预算隐空间推理
+        t 与 Δt 调制循环轨迹
     后续研究
       theorem retrieval
       proof planning
       proof repair
       symbolic verifier
       Lean4 integration
+      loop trajectory diagnostics
+      adaptive budget scheduling
 ```
