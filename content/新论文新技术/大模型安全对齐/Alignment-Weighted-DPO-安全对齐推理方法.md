@@ -191,65 +191,9 @@ SAFECHAIN 与本文同属 CoT safety alignment 方向，都强调长推理对安
 ```mermaid
 mindmap
   root((Alignment-Weighted DPO))
-    核心问题
-      现有安全对齐仍怕 jailbreak
-      模型可能只学到浅层拒绝模板
-      拒绝行为不一定基于深层推理
-    机制诊断
-      Linear probing
-        Alignment task 早期层易区分
-        Reasoning task 后期层才改善
-      Causal intervention
-        置零 reasoning-critical heads 的 QKV
-        推理能力显著下降
-        安全拒绝基本不变
-      结论边界
-        支持浅层启发式假设
-        不能证明完全没有语义理解
-    CoT Safety SFT
-      安全样本
-        解释为什么有害
-        解释为什么拒绝
-        给出安全替代方向
-      通用样本
-        维持 utility
-        降低过度安全化
-      输出格式
-        think reasoning
-        final response
-    AW-DPO
-      错误模式
-        推理安全但回答不安全
-        推理不安全但回答安全
-      分段评分
-        full response score
-        reasoning score
-        response score
-      偏好构造
-        采样多个候选
-        full score 差异超过阈值
-        构造 chosen rejected pair
-      加权优化
-        reasoning DPO loss
-        response DPO loss
-        segment-level safety weight
-    实验结果
-      SorryBench
-        多种 jailbreak 攻击
-        多类 harmful prompt
-      MMLU
-        utility proxy
-      主要发现
-        CoT Safety SFT 优于普通 SFT
-        AW-DPO 多数情况下优于标准 DPO
-        数据具备一定跨模型迁移性
-    局限
-      依赖 LLM-as-a-judge
-      reasoning-only 评分稳定性仍需验证
-      显式 CoT 可能暴露安全推理
-      缺少多轮工具调用真实红队评测
-    研究价值
-      把安全对齐推进到过程层面
-      提供 segment-level credit assignment
-      启发隐式安全推理与过程偏好优化
+    CoT safety
+    segment scoring
+    weighted DPO
+    jailbreak robustness
+    utility retention
 ```

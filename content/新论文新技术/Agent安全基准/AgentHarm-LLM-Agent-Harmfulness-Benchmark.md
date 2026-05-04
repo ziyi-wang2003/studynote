@@ -303,56 +303,9 @@ StrongReject 系列指出，很多 jailbreak success metric 会被“空洞越�
 ```mermaid
 mindmap
   root((AgentHarm))
-    核心问题
-      Chatbot评测不足
-      Tool-using agent风险更大
-      直接恶意用户滥用
-      多步工具轨迹有害性
-    Benchmark设计
-      110个基础行为
-      440个增强任务
-      11类harm categories
-      104个合成工具
-      benign counterpart
-      public和private split
-    合成工具环境
-      无真实副作用
-      Inspect AI实现
-      多工具顺序依赖
-      支持错误恢复
-      代理真实工具风险
-    评分指标
-      Harm Score
-        任务特定rubric
-        工具调用检查
-        参数与顺序检查
-        窄语义LLM子判断
-      Refusal Rate
-        全轨迹拒绝检测
-      Non-refusal Harm Score
-        分离拒绝与能力
-      Benign Score
-        估计基础agent能力
-    实验发现
-      部分模型直接高服从
-      通用jailbreak可迁移
-      攻击后能力仍保留
-      Best-of-n放大风险
-      Chat-only不能替代agent评测
-    失败模式
-      参数幻觉
-      工具顺序错误
-      自我修正失败
-      中途拒绝
-      长参数和多步动作困难
-    局限
-      英文任务
-      无多轮用户攻击
-      合成工具代理性有限
-      rubric可能漏掉替代轨迹
-      不等于真实世界自主危害能力
-    研究意义
-      从文本安全转向行为安全
-      从单轮拒绝转向过程监督
-      为agent safety benchmark提供标准参照
+    tool-use safety
+    malicious tasks
+    synthetic tools
+    rubric judge
+    benign baseline
 ```

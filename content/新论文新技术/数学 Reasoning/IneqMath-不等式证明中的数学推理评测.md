@@ -316,40 +316,11 @@ IneqMath 与 DeepSeek-Prover-V2 这类 formal theorem proving 工作形成互补
 ```mermaid
 mindmap
   root((IneqMath))
-    研究问题
-      数学答案正确不等于证明正确
-      不等式证明需要定理选择与 tight bound
-      final-answer benchmark 高估模型
-    任务重构
-      Bound estimation
-        找最优常数
-        需要证明 tightness
-      Relation prediction
-        判断表达式关系
-        保留全定义域推理
-    数据集
-      200 test problems
-      100 dev problems
-      1252 training problems
-      83 named theorems
-      29 theorem categories
-    评测框架
-      Final Answer Judge
-      Toy Case Judge
-      Logical Gap Judge
-      Numerical Approximation Judge
-      Numerical Computation Judge
-    核心发现
-      o1 answer 62.5 overall 8.0
-      Grok3 mini answer 71.5 overall 6.0
-      模型规模提升不能消除过程错误
-      更长推理存在收益饱和
-    后续方向
-      theorem retrieval
-      proof repair
-      formal verifier integration
-      process reward model
-      judge robustness
+    inequality proof
+    bound estimation
+    relation prediction
+    process judge
+    proof reliability
 ```
 
 ## 参考来源

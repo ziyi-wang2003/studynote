@@ -133,13 +133,13 @@ LoopFormer 是 decoder-only looped Transformer。每一步先把 `t` 与 `Δt` �
 
 ## 图文并茂的讲解
 
-![LoopFormer architecture and elastic-depth inference](/static/images/uploads/数学 Reasoning/loopformer-architecture.png)
+![LoopFormer architecture and elastic-depth inference](/static/images/uploads/Looped Transformer/loopformer-architecture.png)
 
 上图适合从两个层次理解 LoopFormer。左侧是架构：输入 token embedding 后，模型反复执行同一个 `K` 层共享 Transformer stack。每次循环前，模型读取当前 normalized time `t_{i-1}` 和 step size `Δ_i`，生成 conditioning `c_i`，再调制 RMSNorm scale 与 MHSA/FFN residual gate。也就是说，共享 block 并不是盲目重复，而是被告知当前 loop 的“阶段”和“步幅”。
 
 右侧是预算条件推理：`M=1`、`M=2`、`M=L` 都要从 `t=0` 走到 `t=1`，只是离散化粗细不同。低预算时，模型用较大步长直接走完整条轨迹；高预算时，模型用更多小步持续 refinement。理想状态下，低预算输出已经可用，高预算输出更准确。
 
-![Shortcut consistency training and representation dynamics](/static/images/uploads/数学 Reasoning/loopformer-shortcut-consistency.png)
+![Shortcut consistency training and representation dynamics](/static/images/uploads/Looped Transformer/loopformer-shortcut-consistency.png)
 
 这张图可以对应训练机制。full path 走 `L` 个小步，产生高质量 endpoint；shortcut path 走较少步数，必须通过 CE loss 和 consistency loss 学会逼近 full path 的 stop-gradient target。这里的 stop-gradient 很重要：长路径充当 teacher，短路径学习对齐它，但不会反过来把 full path 拉坏。
 
@@ -306,59 +306,9 @@ LoopFormer 使用 curvature、anisotropy、prompt entropy 和 CKA 证明自己�
 ```mermaid
 mindmap
   root((LoopFormer))
-    问题动机
-      Looped Transformer 有 latent reasoning 归纳偏置
-      传统方法固定训练与推理 loop 次数
-      短预算 early exit 容易退化
-      长预算重复循环可能 stagnation
-      部署需要 elastic depth
-    核心思想
-      隐空间轨迹
-        h(0) 到 h(1)
-        normalized time t
-        step size Δt
-        用户选择预算 M
-      Shortcut modulation
-        t 表示当前位置
-        Δt 表示单步跨度
-        Fourier features
-        MLP conditioning
-      Block 调制
-        RMSNorm scale
-        MHSA residual gate
-        FFN residual gate
-        共享 K 层 block 重复执行
-    训练目标
-      Full trajectory CE
-      Shortcut trajectory CE
-      Shortcut consistency
-        stop-gradient full path target
-        短路径对齐长路径
-        类似 diffusion consistency
-      随机采样 shortcut length
-      采样 step schedule
-    实验结论
-      Looped baselines 中最好
-      24x 下 accuracy 接近 non-looped base
-      perplexity 仍落后 non-shared deep model
-      12x 和 6x 预算下平滑退化
-      schedule 选择影响明显
-    表示分析
-      Early exit 表示平坦
-      CKA 高说明跨步相似
-      LoopFormer 中间深度持续演化
-      末端逐渐收敛
-      支持避免 stagnation 的解释
-    局限
-      训练开销约 1.3x wall-clock
-      global budget 非 token adaptive
-      表示分析偏相关性
-      大规模 LLM serving 成本未充分验证
-      schedule policy 尚未学习
-    后续阅读
-      Ouro 扩展 looped LM 规模
-      MoR 做 token-level recursion routing
-      RLTT 奖励 latent thought trajectory
-      Mechanistic analysis 解释固定点
-      Recurrent-depth generalization 研究 overthinking
+    elastic depth
+    t and Δt
+    shortcut consistency
+    trajectory diagnostics
+    budget inference
 ```
