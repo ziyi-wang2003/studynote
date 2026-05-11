@@ -490,6 +490,37 @@ async function openArticle(path) {
         // Tab inserts spaces
         if (e.key === 'Tab') { e.preventDefault(); const s=editor.selectionStart,en=editor.selectionEnd; editor.value=editor.value.substring(0,s)+'    '+editor.value.substring(en); editor.selectionStart=editor.selectionEnd=s+4; dirty=true; renderPreview(); }
     });
+    // Paste image from clipboard
+    editor.addEventListener('paste', async (e) => {
+        const items = e.clipboardData && e.clipboardData.items;
+        if (!items) return;
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                e.preventDefault();
+                const file = item.getAsFile();
+                const ext = item.type.split('/')[1] || 'png';
+                const filename = 'paste_' + Date.now() + '.' + ext;
+                try {
+                    const resp = await fetch(API + '/upload-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': file.type, 'X-Filename': filename },
+                        body: file
+                    });
+                    const data = await resp.json();
+                    if (data.ok) {
+                        const pos = editor.selectionStart;
+                        const tag = '![' + filename + '](' + data.path + ')';
+                        editor.value = editor.value.substring(0, pos) + tag + editor.value.substring(editor.selectionEnd);
+                        editor.selectionStart = editor.selectionEnd = pos + tag.length;
+                        dirty = true;
+                        renderPreview();
+                        toast('图片已上传');
+                    }
+                } catch(err) { toast('图片上传失败: ' + err.message); }
+                break;
+            }
+        }
+    });
     // Sync scroll
     editor.addEventListener('scroll', () => {
         const pane = document.getElementById('previewPane');

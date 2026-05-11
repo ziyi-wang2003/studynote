@@ -87,6 +87,7 @@ def convert_obsidian_links(text):
     return re.sub(r'\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]', lambda m: m.group(2) or m.group(1), text)
 
 
+
 def _ensure_blank_before_blocks(text):
     text = re.sub(r'(\S[^\n]*)\n([ \t]*[-*+] )', r'\1\n\n\2', text)
     text = re.sub(r'(\S[^\n]*)\n([ \t]*\d+\. )', r'\1\n\n\2', text)
@@ -196,8 +197,8 @@ def parse_article(filepath):
         'summary': front.get('summary', ''),
         'order': front.get('order', 0),
         'pinned': front.get('pinned', False),
-        'created': front.get('created', ''),
-        'updated': front.get('updated', ''),
+        'created': str(front.get('created', '')),
+        'updated': str(front.get('updated', '')),
         'content_raw': body,
         'slug': re.sub(r'[^\w\u4e00-\u9fff-]', '-', title).strip('-'),
         'filename': filepath.stem,
@@ -286,7 +287,7 @@ def build():
                 art['_sub'] = sub
                 all_articles.append(art)
 
-    recent = sorted(all_articles, key=lambda a: a.get('updated', ''), reverse=True)[:8]
+    recent = sorted(all_articles, key=lambda a: str(a.get('updated', '')), reverse=True)[:8]
 
     # Use absolute BASE_URL for all root references
     R = BASE_URL  # e.g. '/studynote/' or '/'
