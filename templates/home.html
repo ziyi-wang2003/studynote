@@ -6,140 +6,81 @@
 <div class="home-wrap">
     <!-- Hero -->
     <section class="hero">
-        <div class="hero-grid">
-            <div class="hero-content">
-                <div class="hero-badge"><i class="bi bi-terminal" style="font-size: 0.7rem;"></i> Technical Notebook</div>
-                <h1>工程、算法与<span class="text-gradient">机器学习</span>笔记</h1>
-                <p class="hero-desc">持续记录的技术学习笔记。<br>用 Markdown 书写，结构化沉淀每一个知识点。</p>
-                <div class="hero-counters">
-                    <div class="counter-item">
-                        <span class="counter-num">{{ total_categories }}</span>
-                        <span class="counter-label">学习分区</span>
-                    </div>
-                    <div class="counter-divider"></div>
-                    <div class="counter-item">
-                        <span class="counter-num">{{ total_articles }}</span>
-                        <span class="counter-label">篇笔记</span>
-                    </div>
-                </div>
+        <div class="hero-badge"><i class="bi bi-terminal"></i> Technical Notebook</div>
+        <h1>工程、算法与<span class="text-gradient">机器学习</span>笔记</h1>
+        <p class="hero-desc">持续记录的技术学习笔记，用 Markdown 书写，结构化沉淀每一个知识点。</p>
+        <div class="hero-counters">
+            <div class="counter-item">
+                <span class="counter-num">{{ total_categories }}</span>
+                <span class="counter-label">学习分区</span>
             </div>
-            <div class="hero-visual">
-                <div class="hero-code-block">
-                    <div class="code-dots"><span></span><span></span><span></span></div>
-                    <pre><code><span class="c-keyword">class</span> <span class="c-class">Knowledge</span>:
-    <span class="c-keyword">def</span> <span class="c-func">__init__</span>(self):
-        self.notes = []
-        self.growing = <span class="c-bool">True</span>
-
-    <span class="c-keyword">def</span> <span class="c-func">learn</span>(self, topic):
-        self.notes.append(topic)
-        <span class="c-keyword">return</span> <span class="c-string">"Keep going!"</span></code></pre>
-                </div>
+            <div class="counter-divider"></div>
+            <div class="counter-item">
+                <span class="counter-num">{{ total_articles }}</span>
+                <span class="counter-label">篇笔记</span>
             </div>
         </div>
     </section>
 
-    <!-- Main two-column layout -->
-    <div class="home-body">
-        <!-- Left: categories + recent -->
-        <div class="home-main">
-            <div class="section-head">
-                <div class="section-title">
-                    <div class="section-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
-                    <div>
-                        <h2>知识分区</h2>
-                        <p>按主题组织的笔记目录</p>
-                    </div>
-                </div>
-            </div>
-
-            {% if categories %}
-            <div class="category-grid">
-                {% for cat in categories %}
-                <div class="cat-card" data-href="{{ root }}{{ cat.slug }}/">
-                    <div class="cat-card-head">
-                        <div class="cat-icon" style="background: {{ cat.color }}; color: #fff;">
-                            <i class="bi {{ cat.icon }}"></i>
-                        </div>
-                    </div>
-                    <h3>{{ cat.name }}</h3>
-                    <p class="cat-desc">{{ cat.description or "暂无描述" }}</p>
-                    <div class="cat-stats">
-                        <span><i class="bi bi-folder2-open"></i> {{ cat.subcategories|length }} 分区</span>
-                        <span><i class="bi bi-file-earmark-text"></i> {{ cat.article_count }} 篇</span>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-hero">
-                <div class="empty-icon"><i class="bi bi-journal-plus"></i></div>
-                <h3>还没有学习分区</h3>
-                <p>在 content/ 目录下创建文件夹来添加分区</p>
-            </div>
-            {% endif %}
-
-            <!-- Recent -->
-            {% if recent_articles %}
-            <div class="section-head" style="margin-top: 2.5rem;">
-                <div class="section-title">
-                    <div class="section-icon"><i class="bi bi-clock-history"></i></div>
-                    <div>
-                        <h2>最近更新</h2>
-                        <p>最近编辑的笔记</p>
-                    </div>
-                </div>
-            </div>
-            <div class="recent-card">
-                {% for article in recent_articles %}
-                <a href="{{ root }}{{ article._cat.slug }}/{{ article._sub.slug }}/{{ article.slug }}/" class="recent-row">
-                    <div class="recent-dot" style="background: {{ article._cat.color }}"></div>
-                    <div class="recent-info">
-                        <span class="recent-title">{{ article.title }}</span>
-                        <span class="recent-path">{{ article._cat.name }} <i class="bi bi-chevron-right"></i> {{ article._sub.name }}</span>
-                    </div>
-                    <time class="recent-time">{{ article.updated[:10] }}</time>
-                </a>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Right: sidebar -->
-        <div class="home-side">
-            <div class="glass-card">
-                <div class="glass-card-head">
-                    <i class="bi bi-bar-chart-line"></i>
-                    <span>分区概览</span>
-                </div>
-                {% for cat in categories %}
-                <div class="overview-row">
-                    <div class="overview-label">
-                        <span class="overview-dot" style="background: {{ cat.color }}"></span>
-                        {{ cat.name }}
-                    </div>
-                    <div class="overview-bar-wrap">
-                        <div class="overview-bar" style="width: {{ widthratio(cat.article_count, total_articles) }}%; background: {{ cat.color }}"></div>
-                    </div>
-                    <span class="overview-num">{{ cat.article_count }}</span>
-                </div>
-                {% else %}
-                <p style="color: var(--text-3); font-size: 0.82rem; text-align: center; padding: 1rem 0;">暂无数据</p>
-                {% endfor %}
+    <!-- Categories -->
+    <div class="section-head">
+        <div class="section-title">
+            <div class="section-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div>
+                <h2>知识分区</h2>
+                <p>按主题组织的笔记目录</p>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.cat-card[data-href]').forEach(function(card) {
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', function(e) {
-            if (e.target.closest('.cat-actions')) return;
-            window.location.href = card.dataset.href;
-        });
-    });
-});
-</script>
+    {% if categories %}
+    <div class="category-grid">
+        {% for cat in categories %}
+        <a class="cat-card" href="{{ root }}{{ cat.slug }}/">
+            <div class="cat-icon" style="background: {{ cat.color }}; color: #fff;">
+                <i class="bi {{ cat.icon }}"></i>
+            </div>
+            <div class="cat-body">
+                <h3>{{ cat.name }}</h3>
+                <p class="cat-desc">{{ cat.description or "暂无描述" }}</p>
+            </div>
+            <div class="cat-stats">
+                <span>{{ cat.subcategories|length }} 个分区</span>
+                <span class="cat-dot">·</span>
+                <span>{{ cat.article_count }} 篇笔记</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-hero">
+        <div class="empty-icon"><i class="bi bi-journal-plus"></i></div>
+        <h3>还没有学习分区</h3>
+        <p>在 content/ 目录下创建文件夹来添加分区</p>
+    </div>
+    {% endif %}
+
+    <!-- Recent -->
+    {% if recent_articles %}
+    <div class="section-head" style="margin-top: var(--s-8);">
+        <div class="section-title">
+            <div class="section-icon"><i class="bi bi-clock-history"></i></div>
+            <div>
+                <h2>最近更新</h2>
+                <p>最近编辑的笔记</p>
+            </div>
+        </div>
+    </div>
+    <div class="recent-card">
+        {% for article in recent_articles %}
+        <a href="{{ root }}{{ article._cat.slug }}/{{ article._sub.slug }}/{{ article.slug }}/" class="recent-row">
+            <span class="recent-dot" style="background: {{ article._cat.color }}"></span>
+            <span class="recent-title">{{ article.title }}</span>
+            <span class="recent-path">{{ article._cat.name }} <i class="bi bi-chevron-right"></i> {{ article._sub.name }}</span>
+            <time class="recent-time">{{ article.updated[:10] }}</time>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
