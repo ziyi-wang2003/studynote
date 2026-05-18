@@ -16,8 +16,11 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
 }
+/* NOTE: do NOT set overflow-x:hidden on html/body — it turns the
+   viewport into a scroll container and breaks position:sticky
+   for the TOC sidebar. Horizontal overflow is prevented by
+   max-width on wrappers + min-width:0 on flex children. */
 
 h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
 ul, ol { margin: 0; padding: 0; }
@@ -271,7 +274,9 @@ body.editor-mode .site-footer { display: none; }
 .crumb a:hover { color: var(--accent-600); }
 .crumb i.bi-chevron-right { font-size: 0.55rem; opacity: 0.55; }
 
-.page-body { display: flex; gap: var(--s-8); align-items: flex-start; justify-content: center; }
+/* align-items:stretch so the side column is as tall as the article,
+   giving the sticky TOC room to travel the full page length */
+.page-body { display: flex; gap: var(--s-8); align-items: stretch; justify-content: center; }
 .page-side-left { width: 240px; flex-shrink: 0; }
 .page-main { flex: 1; min-width: 0; max-width: 780px; }
 
@@ -443,7 +448,7 @@ body.editor-mode .site-footer { display: none; }
 .article-body { padding: var(--s-7) var(--s-8) var(--s-8); }
 .article-bottom-nav { margin-top: var(--s-5); }
 
-.markdown-content { font-size: 1.02rem; line-height: 1.8; color: var(--gray-800); }
+.markdown-content { font-size: 1.02rem; line-height: 1.8; color: var(--gray-800); overflow-wrap: break-word; }
 .markdown-content > *:first-child { margin-top: 0; }
 
 .markdown-content h1, .markdown-content h2,
@@ -500,7 +505,12 @@ body.editor-mode .site-footer { display: none; }
     border: 1px solid var(--accent-100);
 }
 .markdown-content pre { margin: 1.5em 0; }
-.markdown-content pre code { background: none; color: inherit; padding: 0; border: none; }
+.markdown-content pre code { background: none; padding: 0; border: none; }
+/* Plain / unhighlighted code (no token spans) must stay light on the
+   dark surface — high enough specificity to beat inherited body color */
+.markdown-content .highlight,
+.markdown-content .highlight pre,
+.markdown-content .highlight pre code { color: #c8cdd4; }
 
 .markdown-content table {
     width: 100%; border-collapse: collapse;
