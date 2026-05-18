@@ -16,34 +16,22 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
     <!-- Code highlighting -->
     <link rel="stylesheet" href="{{ root }}static/css/code.css">
-    <!-- Design tokens (forest palette) -->
+    <!-- Design tokens -->
     <link rel="stylesheet" href="{{ root }}static/css/tokens.css">
     <!-- Custom -->
     <link rel="stylesheet" href="{{ root }}static/css/style.css">
-    <!-- Forest ambient layer -->
-    <link rel="stylesheet" href="{{ root }}static/css/forest_motion.css">
     {% block extra_css %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
-    <!-- Ambient background -->
-    <div class="ambient-bg">
-        <div class="ambient-orb ambient-orb-1"></div>
-        <div class="ambient-orb ambient-orb-2"></div>
-        <div class="ambient-orb ambient-orb-3"></div>
-    </div>
-    <!-- Forest creature layer (fireflies, leaves, pollen) -->
-    <div id="forest-layer" aria-hidden="true"></div>
-
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ root }}">
                 <div class="brand-icon">
-                    <i class="bi bi-flower2"></i>
+                    <i class="bi bi-journal-code"></i>
                 </div>
                 <div class="brand-text">
                     <span class="brand-name">StudyNotes</span>
-                    <span class="brand-sub">Knowledge Garden</span>
                 </div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -71,10 +59,10 @@
         <div class="container">
             <div class="footer-inner">
                 <div class="footer-brand">
-                    <i class="bi bi-flower2"></i>
+                    <i class="bi bi-journal-code"></i>
                     <span>StudyNotes</span>
                 </div>
-                <p>Let knowledge grow naturally. <i class="bi bi-tree" style="color: var(--green-400); font-size: 0.82rem;"></i></p>
+                <p>Notes on engineering, algorithms &amp; machine learning.</p>
             </div>
         </div>
     </footer>
@@ -84,7 +72,6 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
     <script src="{{ root }}static/js/main.js"></script>
-    <script src="{{ root }}static/js/forest_motion.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -97,7 +84,7 @@
             pre.parentNode.replaceChild(div, pre);
         });
         if (document.querySelector('.mermaid')) {
-            mermaid.initialize({ startOnLoad: true, theme: 'forest' });
+            mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
         }
     });
     </script>
