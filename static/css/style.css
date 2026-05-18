@@ -735,3 +735,44 @@ body.editor-mode .editor-wrap .markdown-editor { resize: none; overscroll-behavi
     body { background: #fff; color: #000; }
     * { animation: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════
+   Monochrome enforcement + premium refinements
+   Content carries per-category colors as inline styles;
+   override them so the whole site stays strictly black/white.
+   ════════════════════════════════════════════════════════ */
+.cat-icon[style], .cat-hero-icon[style] {
+    background: #111 !important;
+    color: #fff !important;
+    border-radius: var(--radius-sm);
+}
+.recent-dot[style] {
+    background: #c9c9c9 !important;
+    width: 6px; height: 6px;
+}
+.sub-marker[style] { background: #111 !important; }
+.cat-hero { border-left-color: #111 !important; }
+.article-tag[style] {
+    background: var(--bg-2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+.art-pin, .pin-icon { color: var(--text-3) !important; }
+
+/* Two-tone title: accented part in muted grey, not colour */
+.text-gradient { color: var(--text-3); }
+
+/* Premium: crisper hero badge, flatter cards, hairline rhythm */
+.hero-badge {
+    background: transparent;
+    border-color: var(--border-strong);
+    color: var(--text-2);
+}
+.cat-card { box-shadow: none; }
+.cat-card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); }
+.glass-card, .recent-card, .article-list, .cat-hero, .article-page { box-shadow: none; }
+.hero-counters { box-shadow: none; }
+.section-icon { background: #111; }
+.brand-icon { background: #111; }
+.markdown-content h2 { border-left-color: #111; }
+::selection { background: #111; color: #fff; }
