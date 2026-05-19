@@ -448,7 +448,7 @@ body.editor-mode .site-footer { display: none; }
 .article-body { padding: var(--s-7) var(--s-8) var(--s-8); }
 .article-bottom-nav { margin-top: var(--s-5); }
 
-.markdown-content { font-size: 1.02rem; line-height: 1.8; color: var(--gray-800); overflow-wrap: break-word; }
+.markdown-content { font-size: 1.02rem; line-height: 1.8; color: #dcdce4; overflow-wrap: break-word; }
 .markdown-content > *:first-child { margin-top: 0; }
 
 .markdown-content h1, .markdown-content h2,
@@ -781,7 +781,7 @@ body {
     color: var(--text-2);
     backdrop-filter: blur(4px);
 }
-.text-gradient { color: var(--text-3); }
+.text-gradient { color: var(--text-2); }
 .markdown-content h2 { border-left-color: #e9e9ee; }
 .markdown-content code { background: rgba(255,255,255,0.06); border-color: var(--border); color: #e9e9ee; }
 .highlight { border-color: var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
