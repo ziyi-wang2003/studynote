@@ -7,17 +7,17 @@
    ============================================================ */
 
 :root {
-  /* ── Accent (monochrome — black/grey only) ────────────── */
-  --accent-50:  #f3f3f3;
-  --accent-100: #e6e6e6;
-  --accent-200: #cdcdcd;
-  --accent-300: #a6a6a6;
-  --accent-400: #6e6e6e;
-  --accent-500: #1c1c1c;   /* primary ink */
-  --accent-600: #141414;
-  --accent-700: #0d0d0d;
-  --accent-800: #070707;
-  --accent-900: #000000;
+  /* ── Accent (light "ink" on dark UI) ──────────────────── */
+  --accent-50:  #1b1b20;
+  --accent-100: #26262d;
+  --accent-200: #34343d;
+  --accent-300: #5a5a66;
+  --accent-400: #8c8c99;
+  --accent-500: #e9e9ee;   /* primary — near-white */
+  --accent-600: #f4f4f7;
+  --accent-700: #fafafb;
+  --accent-800: #ffffff;
+  --accent-900: #ffffff;
 
   /* ── Neutral ink & paper scale ────────────────────────── */
   --gray-0:   #ffffff;
@@ -35,35 +35,35 @@
   --gray-900: #1a1a18;
 
   /* ── Semantic surfaces ────────────────────────────────── */
-  --bg:            #f5f5f5;          /* page — neutral light grey */
-  --bg-2:          #ededed;          /* inset / hover fill */
-  --bg-card:       #ffffff;          /* card surface */
-  --bg-card-solid: #ffffff;
-  --bg-glass:      #ffffff;
-  --bg-hover:      #f7f7f7;
-  --bg-code:       #161616;          /* near-black code surface */
-  --bg-code-head:  #0e0e0e;
+  --bg:            #0a0a0c;          /* page — deep near-black */
+  --bg-2:          #18181d;          /* inset / hover fill */
+  --bg-card:       #121216;          /* glossy panel base */
+  --bg-card-solid: #121216;
+  --bg-glass:      rgba(20,20,25,0.7);
+  --bg-hover:      #1c1c22;
+  --bg-code:       #0c0c0f;          /* code surface — darker than panel */
+  --bg-code-head:  #08080a;
 
-  --text:    #0d0d0d;                /* near-black ink */
-  --text-2:  #5a5a5a;
-  --text-3:  #909090;
-  --text-inv:#fafafa;
+  --text:    #ededf1;                /* off-white ink */
+  --text-2:  #9a9aa6;
+  --text-3:  #62626d;
+  --text-inv:#0a0a0c;
 
-  --border:        #e3e3e3;          /* hairline */
-  --border-2:      #ededed;
-  --border-strong: #cdcdcd;
-  --border-hover:  #0d0d0d;
+  --border:        rgba(255,255,255,0.09);   /* hairline on dark */
+  --border-2:      rgba(255,255,255,0.05);
+  --border-strong: rgba(255,255,255,0.20);
+  --border-hover:  rgba(255,255,255,0.34);
 
-  --glow:        rgba(0, 0, 0, 0.05);
-  --glow-strong: rgba(0, 0, 0, 0.10);
+  --glow:        rgba(255,255,255,0.05);
+  --glow-strong: rgba(255,255,255,0.10);
 
-  /* ── Shadows (flat, restrained — premium minimal) ─────── */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-1:  0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-2:  0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-3:  0 8px 28px rgba(0, 0, 0, 0.10);
-  --shadow-glow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-inner-glint: none;
+  /* ── Shadows (depth on black) ─────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-1:  0 1px 2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+  --shadow-2:  0 6px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+  --shadow-3:  0 16px 48px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+  --shadow-glow: 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-inner-glint: inset 0 1px 0 rgba(255,255,255,0.05);
 
   /* ── Radii ────────────────────────────────────────────── */
   --radius-xs: 5px;

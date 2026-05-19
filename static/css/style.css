@@ -737,42 +737,62 @@ body.editor-mode .editor-wrap .markdown-editor { resize: none; overscroll-behavi
 }
 
 /* ════════════════════════════════════════════════════════
-   Monochrome enforcement + premium refinements
-   Content carries per-category colors as inline styles;
-   override them so the whole site stays strictly black/white.
+   Dark high-tech layer — glossy panels, hairline grid,
+   sectioned blocks. Per-category colours stay (adds life).
    ════════════════════════════════════════════════════════ */
-.cat-icon[style], .cat-hero-icon[style] {
-    background: #111 !important;
-    color: #fff !important;
-    border-radius: var(--radius-sm);
+body {
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(900px 460px at 50% -160px, rgba(255,255,255,0.07), transparent 72%),
+        linear-gradient(rgba(255,255,255,0.021) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.021) 1px, transparent 1px);
+    background-size: 100% 100%, 56px 56px, 56px 56px;
+    background-position: 0 0, 0 0, 0 0;
+    background-attachment: fixed;
 }
-.recent-dot[style] {
-    background: #c9c9c9 !important;
-    width: 6px; height: 6px;
-}
-.sub-marker[style] { background: #111 !important; }
-.cat-hero { border-left-color: #111 !important; }
-.article-tag[style] {
-    background: var(--bg-2) !important;
-    color: var(--text) !important;
-    border: 1px solid var(--border) !important;
-}
-.art-pin, .pin-icon { color: var(--text-3) !important; }
 
-/* Two-tone title: accented part in muted grey, not colour */
-.text-gradient { color: var(--text-3); }
+.navbar { background: rgba(10,10,12,0.66); border-bottom: 1px solid var(--border); }
+.navbar.scrolled { box-shadow: 0 1px 0 var(--border), 0 10px 34px rgba(0,0,0,0.65); }
 
-/* Premium: crisper hero badge, flatter cards, hairline rhythm */
+/* Glossy panels: subtle top sheen + depth */
+.cat-card, .glass-card, .recent-card, .article-list,
+.article-page, .cat-hero, .hero-counters {
+    background-color: var(--bg-card);
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0) 140px);
+    box-shadow: var(--shadow-1);
+}
+.cat-card:hover { box-shadow: var(--shadow-2); border-color: var(--border-strong); }
+
+/* Crisp light chips for brand / section markers */
+.section-icon, .brand-icon {
+    background: linear-gradient(180deg, #ffffff, #cdcdd4);
+    color: #0a0a0c;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 10px rgba(0,0,0,0.55);
+}
+.btn-glow {
+    background: linear-gradient(180deg, #ffffff, #d9d9df);
+    color: #0a0a0c; border-color: #ffffff;
+}
+.btn-glow:hover { background: #ffffff; color: #0a0a0c; }
+
 .hero-badge {
-    background: transparent;
+    background: rgba(255,255,255,0.045);
     border-color: var(--border-strong);
     color: var(--text-2);
+    backdrop-filter: blur(4px);
 }
-.cat-card { box-shadow: none; }
-.cat-card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); }
-.glass-card, .recent-card, .article-list, .cat-hero, .article-page { box-shadow: none; }
-.hero-counters { box-shadow: none; }
-.section-icon { background: #111; }
-.brand-icon { background: #111; }
-.markdown-content h2 { border-left-color: #111; }
-::selection { background: #111; color: #fff; }
+.text-gradient { color: var(--text-3); }
+.markdown-content h2 { border-left-color: #e9e9ee; }
+.markdown-content code { background: rgba(255,255,255,0.06); border-color: var(--border); color: #e9e9ee; }
+.highlight { border-color: var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
+::selection { background: #e9e9ee; color: #0a0a0c; }
+
+/* Sectioned "blocks" — hairline rules between regions */
+.section-head { border-top: 1px solid var(--border); padding-top: var(--s-7); }
+.toc-sidebar { background-clip: padding-box; }
+
+@media print {
+    body { background: #fff !important; }
+    .cat-card, .glass-card, .recent-card, .article-list,
+    .article-page, .cat-hero { background-image: none; }
+}
