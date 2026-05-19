@@ -44,9 +44,9 @@
   --bg-code:       #0c0c0f;          /* code surface — darker than panel */
   --bg-code-head:  #08080a;
 
-  --text:    #f0f0f4;                /* primary ink */
-  --text-2:  #b6b6c2;                /* secondary — clearly readable */
-  --text-3:  #8e8e9c;                /* muted meta — still legible on black */
+  --text:    #ffffff;                /* primary — pure white */
+  --text-2:  #d6d6de;                /* secondary — bright */
+  --text-3:  #adadba;                /* muted meta — still bright */
   --text-inv:#0a0a0c;
 
   --border:        rgba(255,255,255,0.09);   /* hairline on dark */

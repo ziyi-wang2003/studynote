@@ -448,7 +448,9 @@ body.editor-mode .site-footer { display: none; }
 .article-body { padding: var(--s-7) var(--s-8) var(--s-8); }
 .article-bottom-nav { margin-top: var(--s-5); }
 
-.markdown-content { font-size: 1.02rem; line-height: 1.8; color: #dcdce4; overflow-wrap: break-word; }
+.markdown-content { font-size: 1.02rem; line-height: 1.8; color: #ffffff; overflow-wrap: break-word; }
+.markdown-content p, .markdown-content li, .markdown-content td,
+.markdown-content blockquote, .markdown-content dl { color: #ffffff; }
 .markdown-content > *:first-child { margin-top: 0; }
 
 .markdown-content h1, .markdown-content h2,
