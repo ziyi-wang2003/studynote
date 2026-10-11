@@ -41,7 +41,7 @@ flowchart LR
 
 ## 3. 反向 KL 到底比较什么
 
-在学生生成的前缀 $s_t=(x,y_{<t})$ 上，记学生下一 token 分布为 $p_S$，教师为 $p_T$。一种常用损失是：
+在学生生成的前缀 $s_t=(x,y_{1:t-1})$ 上，记学生下一 token 分布为 $p_S$，教师为 $p_T$。一种常用损失是：
 
 $$
 D_{KL}(p_S\|p_T)=\sum_v p_S(v|s_t)\left[\log p_S(v|s_t)-\log p_T(v|s_t)\right]
@@ -87,7 +87,7 @@ def opd_reverse_kl(student_logits, teacher_logits, response_mask):
     return (kl_per_token * mask).sum() / mask.sum().clamp_min(1)
 
 logits = torch.randn(1, 4, 8, requires_grad=True)
-mask = torch.tensor([[0, 0, 1, 1]])
+mask = torch.tensor([0, 0, 1, 1]).unsqueeze(0)
 loss = opd_reverse_kl(logits, logits.detach(), mask)
 print(loss.item())  # 同一分布，KL = 0
 ```
