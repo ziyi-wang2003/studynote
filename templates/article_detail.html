@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ article.title }} - StudyNotes{% endblock %}
+{% block body_class %}reading-page{% endblock %}
 
 {% block content %}
 <div class="page-wrap">
     <!-- Breadcrumb -->
-    <nav class="crumb">
+    <nav class="crumb" aria-label="当前位置">
         <a href="{{ root }}"><i class="bi bi-house-heart"></i> 首页</a>
         <i class="bi bi-chevron-right"></i>
         <a href="{{ root }}{{ category.slug }}/">{{ category.name }}</a>
@@ -48,11 +49,12 @@
                 <!-- Header -->
                 <header class="article-head">
                     <div class="article-head-top">
-                        <div class="article-tag" style="background: {{ category.color }}15; color: {{ category.color }}; border: 1px solid {{ category.color }}30">
+                        <div class="article-tag">
                             <i class="bi {{ category.icon }}"></i> {{ category.name }}
                         </div>
                     </div>
                     <h1>{{ article.title }}</h1>
+                    {% if article.summary %}<p class="article-deck">{{ article.summary }}</p>{% endif %}
                     <div class="article-meta-bar">
                         <span><i class="bi bi-folder2"></i> {{ subcategory.name }}</span>
                         {% if article.created %}
@@ -65,6 +67,10 @@
                 </header>
 
                 <!-- Body -->
+                <details class="mobile-toc">
+                    <summary><i class="bi bi-list-nested"></i> 本页目录 <i class="bi bi-chevron-down"></i></summary>
+                    {{ article_toc }}
+                </details>
                 <div class="article-body markdown-content">
                     {{ article_content }}
                 </div>

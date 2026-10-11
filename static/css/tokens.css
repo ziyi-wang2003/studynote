@@ -8,17 +8,17 @@
 
 :root {
   color-scheme: light;
-  /* ── Accent (monochrome — black/grey only) ────────────── */
-  --accent-50:  #f3f3f3;
-  --accent-100: #e6e6e6;
-  --accent-200: #cdcdcd;
-  --accent-300: #a6a6a6;
-  --accent-400: #6e6e6e;
-  --accent-500: #1c1c1c;   /* primary ink */
-  --accent-600: #141414;
-  --accent-700: #0d0d0d;
-  --accent-800: #070707;
-  --accent-900: #000000;
+  /* ── Accent (quiet notebook blue) ────────────── */
+  --accent-50:  #f0f5ff;
+  --accent-100: #e0eaff;
+  --accent-200: #c6d7fb;
+  --accent-300: #9bb8ee;
+  --accent-400: #658cd1;
+  --accent-500: #365fa1;   /* primary accent */
+  --accent-600: #2b518d;
+  --accent-700: #172b49;
+  --accent-800: #172b49;
+  --accent-900: #12223b;
 
   /* ── Neutral ink & paper scale ────────────────────────── */
   --gray-0:   #ffffff;
@@ -37,23 +37,23 @@
 
   /* ── Semantic surfaces ────────────────────────────────── */
   --bg:            #ffffff;          /* page — paper white */
-  --bg-2:          #ededed;          /* inset / hover fill */
+  --bg-2:          #f3f5f8;          /* inset / hover fill */
   --bg-card:       #ffffff;          /* card surface */
   --bg-card-solid: #ffffff;
   --bg-glass:      #ffffff;
-  --bg-hover:      #f7f7f7;
+  --bg-hover:      #f7f9fc;
   --bg-code:       #f6f8fa;          /* light code surface */
   --bg-code-head:  #eef1f4;
 
-  --text:    #0d0d0d;                /* near-black ink */
-  --text-2:  #5a5a5a;
-  --text-3:  #6b6b6b;
+  --text:    #202b3b;                /* near-black ink */
+  --text-2:  #596576;
+  --text-3:  #687587;
   --text-inv:#fafafa;
 
-  --border:        #e3e3e3;          /* hairline */
-  --border-2:      #ededed;
-  --border-strong: #cdcdcd;
-  --border-hover:  #0d0d0d;
+  --border:        #e3e8ef;          /* hairline */
+  --border-2:      #eef1f5;
+  --border-strong: #c8d3e1;
+  --border-hover:  #365fa1;
 
   --glow:        rgba(0, 0, 0, 0.05);
   --glow-strong: rgba(0, 0, 0, 0.10);
@@ -94,6 +94,7 @@
 
   /* ── Typography ───────────────────────────────────────── */
   --font:      'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-editorial: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
   --font-sc:   'Noto Sans SC', 'Inter', -apple-system, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, monospace;
 

@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ category.name }} - StudyNotes{% endblock %}
+{% block body_class %}directory-page{% endblock %}
 
 {% block content %}
 <div class="page-wrap">
     <!-- Breadcrumb -->
-    <nav class="crumb">
+    <nav class="crumb" aria-label="当前位置">
         <a href="{{ root }}"><i class="bi bi-house-heart"></i> 首页</a>
         <i class="bi bi-chevron-right"></i>
         <span>{{ category.name }}</span>
@@ -44,11 +45,12 @@
         <!-- Main -->
         <div class="page-main">
             <!-- Category Header -->
-            <div class="cat-hero" style="--accent: {{ category.color }}">
-                <div class="cat-hero-icon" style="background: {{ category.color }}; color: #fff;">
+            <div class="cat-hero" style="--category-color: {{ category.color }}">
+                <div class="cat-hero-icon">
                     <i class="bi {{ category.icon }}"></i>
                 </div>
                 <div class="cat-hero-info">
+                    <span class="directory-eyebrow">KNOWLEDGE DIRECTORY</span>
                     <h1>{{ category.name }}</h1>
                     {% if category.description %}<p>{{ category.description }}</p>{% endif %}
                     <div class="cat-hero-meta">

@@ -1,86 +1,64 @@
 {% extends 'base.html' %}
-
 {% block title %}首页 - StudyNotes{% endblock %}
-
+{% block body_class %}home-page{% endblock %}
 {% block content %}
 <div class="home-wrap">
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-badge"><i class="bi bi-terminal"></i> Technical Notebook</div>
-        <h1>大模型算法<span class="text-gradient">学习笔记</span></h1>
-        <p class="hero-desc">记录大模型、算法与工程实践中的知识点与代码实现。</p>
-        <div class="hero-counters">
-            <div class="counter-item">
-                <span class="counter-num">{{ total_categories }}</span>
-                <span class="counter-label">学习分区</span>
+    <section class="hero" aria-labelledby="home-title">
+        <div class="hero-copy">
+            <div class="hero-eyebrow"><span class="status-dot"></span> 个人学习笔记 <span class="eyebrow-divider">/</span> 持续积累</div>
+            <h1 id="home-title">大模型与算法，<br>从原理到<span class="hero-emphasis">实现。</span></h1>
+            <p class="hero-desc">把读过的论文、想明白的原理与写过的代码，<br class="desktop-break">整理成可以随时回看的知识。</p>
+            <a class="hero-link" href="#knowledge">翻开笔记 <i class="bi bi-arrow-down-right"></i></a>
+            <div class="hero-counters" aria-label="笔记统计">
+                <div class="counter-item"><span class="counter-num">{{ total_articles }}</span><span class="counter-label">篇学习笔记</span></div>
+                <div class="counter-divider"></div>
+                <div class="counter-item"><span class="counter-num">{{ '%02d'|format(total_categories) }}</span><span class="counter-label">个知识分区</span></div>
             </div>
-            <div class="counter-divider"></div>
-            <div class="counter-item">
-                <span class="counter-num">{{ total_articles }}</span>
-                <span class="counter-label">篇笔记</span>
+        </div>
+        <div class="notebook-visual" aria-hidden="true">
+            <div class="notebook-sheet">
+                <div class="sheet-top"><span>STUDYNOTES / FIELD NOTES</span><span>01</span></div>
+                <div class="sheet-caption">从一个问题开始。</div>
+                <div class="sheet-equation"><span>Q · K<sup>T</sup></span><span class="equation-line"></span><span class="equation-denominator">√d</span></div>
+                <div class="sheet-rule"></div>
+                <div class="sheet-step"><span>01</span><strong>理解原理</strong><span>Understand</span></div>
+                <div class="sheet-step"><span>02</span><strong>手写实现</strong><span>Build</span></div>
+                <div class="sheet-step"><span>03</span><strong>探索研究</strong><span>Explore</span></div>
+                <div class="sheet-bottom"><span>LEARNING IS A WORK IN PROGRESS</span><i class="bi bi-asterisk"></i></div>
             </div>
+            <div class="notebook-label"><span class="label-line"></span> THINK. WRITE. REVISIT.</div>
         </div>
     </section>
-
-    <!-- Categories -->
-    <div class="section-head">
-        <div class="section-title">
-            <div class="section-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
-            <div>
-                <h2>知识分区</h2>
-                <p>按主题组织的笔记目录</p>
-            </div>
+    <section class="home-section" id="knowledge" aria-labelledby="knowledge-title">
+        <div class="section-head"><div class="section-title"><span class="section-number">01 /</span><h2 id="knowledge-title">知识分区</h2></div><span class="section-caption">KNOWLEDGE DIRECTORY</span></div>
+        {% if categories %}
+        <div class="category-grid">
+            {% for cat in categories %}
+            <a class="cat-card" href="{{ root }}{{ cat.slug }}/" style="--category-color: {{ cat.color }}">
+                <div class="cat-card-top"><span class="cat-index">{{ '%02d'|format(loop.index) }}</span><div class="cat-icon"><i class="bi {{ cat.icon }}"></i></div></div>
+                <div class="cat-body"><h3>{{ cat.name }}</h3><p class="cat-desc">{{ cat.description or "持续整理的学习记录" }}</p></div>
+                <div class="cat-topics">{% for sub in cat.subcategories[:3] %}<span>{{ sub.name }}</span>{% endfor %}{% if cat.subcategories|length > 3 %}<span>+{{ cat.subcategories|length - 3 }}</span>{% endif %}</div>
+                <div class="cat-stats"><span>{{ cat.article_count }} 篇笔记 <span class="cat-dot">/</span> {{ cat.subcategories|length }} 个主题</span><span class="cat-arrow"><i class="bi bi-arrow-up-right"></i></span></div>
+            </a>
+            {% endfor %}
         </div>
-    </div>
-
-    {% if categories %}
-    <div class="category-grid">
-        {% for cat in categories %}
-        <a class="cat-card" href="{{ root }}{{ cat.slug }}/">
-            <div class="cat-icon" style="background: {{ cat.color }}; color: #fff;">
-                <i class="bi {{ cat.icon }}"></i>
-            </div>
-            <div class="cat-body">
-                <h3>{{ cat.name }}</h3>
-                <p class="cat-desc">{{ cat.description or "暂无描述" }}</p>
-            </div>
-            <div class="cat-stats">
-                <span>{{ cat.subcategories|length }} 个分区</span>
-                <span class="cat-dot">·</span>
-                <span>{{ cat.article_count }} 篇笔记</span>
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty-hero">
-        <div class="empty-icon"><i class="bi bi-journal-plus"></i></div>
-        <h3>还没有学习分区</h3>
-        <p>在 content/ 目录下创建文件夹来添加分区</p>
-    </div>
-    {% endif %}
-
-    <!-- Recent -->
+        {% else %}
+        <div class="empty-hero"><h3>笔记正在整理中</h3><p>从一个问题开始，慢慢积累。</p></div>
+        {% endif %}
+    </section>
     {% if recent_articles %}
-    <div class="section-head" style="margin-top: var(--s-8);">
-        <div class="section-title">
-            <div class="section-icon"><i class="bi bi-clock-history"></i></div>
-            <div>
-                <h2>最近更新</h2>
-                <p>最近编辑的笔记</p>
-            </div>
+    <section class="home-section" id="recent" aria-labelledby="recent-title">
+        <div class="section-head"><div class="section-title"><span class="section-number">02 /</span><h2 id="recent-title">最近更新</h2></div><span class="section-caption">RECENT ENTRIES</span></div>
+        <div class="recent-card">
+            {% for article in recent_articles %}
+            <a href="{{ root }}{{ article._cat.slug }}/{{ article._sub.slug }}/{{ article.slug }}/" class="recent-row">
+                <span class="recent-index">{{ '%02d'|format(loop.index) }}</span>
+                <div class="recent-info"><span class="recent-title">{{ article.title }}</span><span class="recent-path">{{ article._cat.name }} <span>/</span> {{ article._sub.name }}</span></div>
+                <time class="recent-time">{{ article.updated[:10] }}</time><i class="bi bi-arrow-up-right recent-arrow"></i>
+            </a>
+            {% endfor %}
         </div>
-    </div>
-    <div class="recent-card">
-        {% for article in recent_articles %}
-        <a href="{{ root }}{{ article._cat.slug }}/{{ article._sub.slug }}/{{ article.slug }}/" class="recent-row">
-            <span class="recent-dot" style="background: {{ article._cat.color }}"></span>
-            <span class="recent-title">{{ article.title }}</span>
-            <span class="recent-path">{{ article._cat.name }} <i class="bi bi-chevron-right"></i> {{ article._sub.name }}</span>
-            <time class="recent-time">{{ article.updated[:10] }}</time>
-        </a>
-        {% endfor %}
-    </div>
+    </section>
     {% endif %}
 </div>
 {% endblock %}
