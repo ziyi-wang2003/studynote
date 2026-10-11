@@ -1,6 +1,6 @@
 ---
 title: 手撕 Top-k、Top-p 与温度采样
-summary: "只处理下一 token 的一行 logits，记住过滤顺序和 Top-p 的阈值边界。"
+summary: "Top-k 和 Top-p 分别手写：一个留固定数量，一个按累计概率保留候选。"
 created: "2026-10-12 00:00"
 updated: "2026-10-12 00:00"
 order: 5
@@ -8,46 +8,64 @@ order: 5
 
 **记住：温度改概率分布，Top-k 留固定数量，Top-p 留累计概率达到 p 的最短前缀。** 约 4 分钟。
 
-## 最小实现
+两个例子都只处理单个样本：输入 `[Vocab]` 的有限 logits，返回一个 token ID。温度为 0 时直接贪心；温度大于 0 时，先用 `logits / temperature` 调整分布。
 
-面试先写单个样本：输入 `[Vocab]` 的有限 logits，返回一个 token ID。这里规定温度为 0 时直接贪心，跳过随机采样。
+## Top-k：只保留最大的 k 个
+
+步骤：**缩放 logits → 取最大的 k 个 → 在这 k 个里 softmax → 采样 → 映射回 token ID**。
 
 ```python
 import torch
 
-def sample_token(logits, temperature=1.0, top_k=0, top_p=1.0):
+def sample_top_k(logits, k=50, temperature=1.0):
     assert logits.ndim == 1 and logits.numel() > 0
-    assert temperature >= 0 and top_k >= 0 and 0 < top_p <= 1
+    assert k >= 1 and temperature >= 0
     if temperature == 0:
         return logits.argmax().item()
-    x = logits.float().clone() / temperature
-
-    if top_k > 0:
-        k = min(top_k, x.numel())
-        indices = torch.topk(x, k).indices
-        keep = torch.zeros_like(x, dtype=torch.bool)
-        keep[indices] = True
-        x = x.masked_fill(~keep, float('-inf'))
-
-    if top_p < 1.0:
-        sorted_x, order = torch.sort(x, descending=True)
-        probs = torch.softmax(sorted_x, dim=-1)
-        cumulative = probs.cumsum(dim=-1)
-        # 若当前 token 之前的概率和已达到 p，才删除当前 token
-        remove = torch.zeros_like(probs, dtype=torch.bool)
-        remove[1:] = cumulative[:-1] >= top_p
-        sorted_x = sorted_x.masked_fill(remove, float('-inf'))
-        x = torch.empty_like(x).scatter(0, order, sorted_x)
-
-    probs = torch.softmax(x, dim=-1)  # 过滤后重新归一化
-    return torch.multinomial(probs, num_samples=1).item()
+    x = logits.float() / temperature
+    values, indices = torch.topk(x, min(k, x.numel()))
+    probs = torch.softmax(values, dim=-1)
+    selected = torch.multinomial(probs, num_samples=1).item()
+    return indices[selected].item()
 
 logits = torch.tensor([3.0, 2.0, 1.0, 0.0])
-print(sample_token(logits, temperature=0))  # 0
-print(sample_token(logits, top_k=1))       # 0
+print(sample_top_k(logits, k=1))  # 0
+print(sample_top_k(logits, k=2))  # 只可能是 token 0 或 1
 ```
 
-## Top-p 最容易错在哪里
+**易错点：**采样得到的是候选列表中的位置，要通过 `indices` 映射回原词表 ID。按索引取 k 个，遇到并列 logits 也不会留下超过 k 个候选。
+
+## Top-p：保留累计概率达到 p 的前缀
+
+步骤：**缩放 logits → 从大到小排序 → 计算累计概率 → 删除前缀外的候选 → 重新 softmax → 采样**。
+
+```python
+import torch
+
+def sample_top_p(logits, p=0.9, temperature=1.0):
+    assert logits.ndim == 1 and logits.numel() > 0
+    assert 0 < p <= 1 and temperature >= 0
+    if temperature == 0:
+        return logits.argmax().item()
+    x = logits.float() / temperature
+    sorted_x, indices = torch.sort(x, descending=True)
+    probs = torch.softmax(sorted_x, dim=-1)
+    cumulative = probs.cumsum(dim=-1)
+
+    # 当前 token 之前的概率和已达到 p，才删除当前 token
+    remove = torch.zeros_like(probs, dtype=torch.bool)
+    if p < 1.0:
+        remove[1:] = cumulative[:-1] >= p
+    sorted_x = sorted_x.masked_fill(remove, float('-inf'))
+    probs = torch.softmax(sorted_x, dim=-1)  # 过滤后重新归一化
+    selected = torch.multinomial(probs, num_samples=1).item()
+    return indices[selected].item()
+
+logits = torch.tensor([0.15, 0.50, 0.05, 0.30]).log()
+print(sample_top_p(logits, p=0.70))  # 只可能是 token 1 或 3
+```
+
+**易错点：**要保留第一个让累计概率达到阈值的 token。
 
 排序后概率为 `[0.50, 0.30, 0.15, 0.05]`，`p=0.70`。应该保留前两个，因为累计到第二个才达到 0.80；不能用“当前累计概率大于 p 就删掉当前项”，那会误删第二个。
 
@@ -56,11 +74,11 @@ print(sample_token(logits, top_k=1))       # 0
 ## 易错点与追问
 
 - **温度越大越怎样？** `logits / temperature` 差异变小，分布更平；温度小于 1 通常更尖锐。
-- **先做哪个？** 本例采用温度 → Top-k → Top-p；Top-p 用 Top-k 过滤后重新归一化的概率，两者一起用时顺序影响候选集。
-- **Top-k 为什么不用小于第 k 大的阈值？** 阈值法遇到并列值可能留下超过 k 个；这里按索引选恰好 k 个。
-- **排序后怎么回到原词表？** 用 `scatter`，再按原 token ID 采样。
+- **Top-k 和 Top-p 的区别？** Top-k 固定候选数量；Top-p 的候选数量随概率分布变化。
+- **过滤后为什么重新 softmax？** 剩余候选的概率需要重新归一化，总和为 1。
+- **排序后怎么回到原词表？** 两个例子都用 `indices[selected]` 映射回原 token ID。
 - **Top-p 和 beam search 一样吗？** Top-p 限制当前步候选并随机采样；beam search 维护多条候选序列。
 
-面试口述：“我先缩放 logits，再删掉 Top-k 和 Top-p 之外的候选，最后重新 softmax 并采样。Top-p 要保留第一个让累计概率达到阈值的 token。”
+面试口述：“Top-k 选概率最高的 k 个候选；Top-p 选累计概率达到 p 的最短前缀。两种方法都在保留的候选里重新归一化并采样。”
 
 参考：[Hugging Face 生成参数文档](https://huggingface.co/docs/transformers/main_classes/text_generation)。
