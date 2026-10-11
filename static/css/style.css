@@ -44,7 +44,7 @@ body.editor-mode .site-footer { display: none; }
    Navbar
    ════════════════════════════════════════════════════════ */
 .navbar {
-    background: rgba(243, 243, 240, 0.88);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: saturate(180%) blur(12px);
     -webkit-backdrop-filter: saturate(180%) blur(12px);
     border-bottom: 1px solid var(--border);
@@ -448,9 +448,7 @@ body.editor-mode .site-footer { display: none; }
 .article-body { padding: var(--s-7) var(--s-8) var(--s-8); }
 .article-bottom-nav { margin-top: var(--s-5); }
 
-.markdown-content { font-size: 1.02rem; line-height: 1.8; color: #ffffff; overflow-wrap: break-word; }
-.markdown-content p, .markdown-content li, .markdown-content td,
-.markdown-content blockquote, .markdown-content dl { color: #ffffff; }
+.markdown-content { font-size: 1.02rem; line-height: 1.8; color: var(--text); overflow-wrap: break-word; }
 .markdown-content > *:first-child { margin-top: 0; }
 
 .markdown-content h1, .markdown-content h2,
@@ -508,11 +506,10 @@ body.editor-mode .site-footer { display: none; }
 }
 .markdown-content pre { margin: 1.5em 0; }
 .markdown-content pre code { background: none; padding: 0; border: none; }
-/* Plain / unhighlighted code (no token spans) must stay light on the
-   dark surface — high enough specificity to beat inherited body color */
+/* Keep unhighlighted code readable on the light code surface. */
 .markdown-content .highlight,
 .markdown-content .highlight pre,
-.markdown-content .highlight pre code { color: #c8cdd4; }
+.markdown-content .highlight pre code { color: var(--text); }
 
 .markdown-content table {
     width: 100%; border-collapse: collapse;
@@ -530,32 +527,32 @@ body.editor-mode .site-footer { display: none; }
 .markdown-content tbody tr:hover td { background: var(--bg-2); }
 .markdown-content hr { border: none; height: 1px; background: var(--border); margin: 2.8em 0; }
 
-/* ── Dark code blocks ────────────────────────────────────── */
+/* ── Light code blocks ────────────────────────────────────── */
 .highlight {
     background: var(--bg-code);
-    border: 1px solid var(--gray-800);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 1.15em 1.35em;
     overflow-x: auto; position: relative;
     margin: 1.5em 0;
 }
 .highlight pre { margin: 0; background: transparent; }
-.highlight code { font-family: var(--font-mono); font-size: 0.86rem; line-height: 1.7; color: #c8cdd4; }
+.highlight code { font-family: var(--font-mono); font-size: 0.86rem; line-height: 1.7; color: var(--text); }
 .highlight::-webkit-scrollbar { height: 9px; }
-.highlight::-webkit-scrollbar-thumb { background: var(--gray-700); border-radius: 4px; border: none; }
+.highlight::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; border: none; }
 
 .code-copy-btn {
     position: absolute; top: 9px; right: 9px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    color: #b9bec7; padding: 3px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-2); padding: 3px 10px;
     border-radius: var(--radius-xs); cursor: pointer;
     font-size: 0.72rem; font-family: var(--font);
     display: flex; align-items: center; gap: 4px;
     opacity: 0; transition: opacity 0.15s, background 0.15s;
 }
 .highlight:hover .code-copy-btn { opacity: 1; }
-.code-copy-btn:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.code-copy-btn:hover { background: var(--bg-2); color: var(--text); }
 .code-copy-btn.copied { background: var(--accent-500); border-color: var(--accent-500); color: #fff; opacity: 1; }
 
 .img-overlay {
@@ -736,65 +733,4 @@ body.editor-mode .editor-wrap .markdown-editor { resize: none; overscroll-behavi
     .article-body { padding: 0; }
     body { background: #fff; color: #000; }
     * { animation: none !important; }
-}
-
-/* ════════════════════════════════════════════════════════
-   Dark high-tech layer — glossy panels, hairline grid,
-   sectioned blocks. Per-category colours stay (adds life).
-   ════════════════════════════════════════════════════════ */
-body {
-    background-color: var(--bg);
-    background-image:
-        radial-gradient(900px 460px at 50% -160px, rgba(255,255,255,0.07), transparent 72%),
-        linear-gradient(rgba(255,255,255,0.021) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.021) 1px, transparent 1px);
-    background-size: 100% 100%, 56px 56px, 56px 56px;
-    background-position: 0 0, 0 0, 0 0;
-    background-attachment: fixed;
-}
-
-.navbar { background: rgba(10,10,12,0.66); border-bottom: 1px solid var(--border); }
-.navbar.scrolled { box-shadow: 0 1px 0 var(--border), 0 10px 34px rgba(0,0,0,0.65); }
-
-/* Glossy panels: subtle top sheen + depth */
-.cat-card, .glass-card, .recent-card, .article-list,
-.article-page, .cat-hero, .hero-counters {
-    background-color: var(--bg-card);
-    background-image: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0) 140px);
-    box-shadow: var(--shadow-1);
-}
-.cat-card:hover { box-shadow: var(--shadow-2); border-color: var(--border-strong); }
-
-/* Crisp light chips for brand / section markers */
-.section-icon, .brand-icon {
-    background: linear-gradient(180deg, #ffffff, #cdcdd4);
-    color: #0a0a0c;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 10px rgba(0,0,0,0.55);
-}
-.btn-glow {
-    background: linear-gradient(180deg, #ffffff, #d9d9df);
-    color: #0a0a0c; border-color: #ffffff;
-}
-.btn-glow:hover { background: #ffffff; color: #0a0a0c; }
-
-.hero-badge {
-    background: rgba(255,255,255,0.045);
-    border-color: var(--border-strong);
-    color: var(--text-2);
-    backdrop-filter: blur(4px);
-}
-.text-gradient { color: var(--text-2); }
-.markdown-content h2 { border-left-color: #e9e9ee; }
-.markdown-content code { background: rgba(255,255,255,0.06); border-color: var(--border); color: #e9e9ee; }
-.highlight { border-color: var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
-::selection { background: #e9e9ee; color: #0a0a0c; }
-
-/* Sectioned "blocks" — hairline rules between regions */
-.section-head { border-top: 1px solid var(--border); padding-top: var(--s-7); }
-.toc-sidebar { background-clip: padding-box; }
-
-@media print {
-    body { background: #fff !important; }
-    .cat-card, .glass-card, .recent-card, .article-list,
-    .article-page, .cat-hero { background-image: none; }
 }
